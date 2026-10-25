@@ -9,8 +9,8 @@
 | E5 scale | Topology and experiment | Done at 8 agents in the `classical` suite; found F-8 (kernel cost grows with the square of the history). In the `pq` suite one round exceeds the bound (F-8) |
 | E8 suites | Experiment | Done: the same scenario in `pq` and `classical`, with sizes |
 | E7 confused deputy over the network | Experiment | Done |
-| E9 policy in the canonical ack (agent-trust R-11) | Experiment and sidecar route | Done locally on branch `feat/r11-r12` |
-| E10 delegation expiry as a ledger event (agent-trust R-12) | Experiment | Done locally on branch `feat/r11-r12`, with a control run against agent-trust without R-12 |
+| E9 policy in the canonical ack (agent-trust R-11) | Experiment and sidecar route | Done on branch `feat/r11-r12`: local, compose, k3s (CI run `40226788501`) |
+| E10 delegation expiry as a ledger event (agent-trust R-12) | Experiment | Done on branch `feat/r11-r12`: local, compose, k3s (CI run `40226788501`), with a control run against agent-trust without R-12 |
 | Agent persistence | Upstream (F-2) and sidecar | Done; upstream on branch `feat/durable-lab-provider`, waiting for merge |
 | mTLS between services | Services | Done, with transport identity bound to protocol identity |
 | Kubernetes backend | Backend | Done, tested on k3s, with NetworkPolicy checks (`experiments/k8s-isolation.toml`) |
