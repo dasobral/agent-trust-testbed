@@ -1,0 +1,171 @@
+# E10: delegation expiry is a ledger event (agent-trust R-12, D-16).
+#   ./attctl run experiments/e10-delegation-expiry.toml --backend local
+# Design and expected results: docs/experiments/E10-delegation-expiry.md
+#
+# carol's delegation lives 45 s of APF wall-clock time; the run waits past it.
+
+[experiment]
+id = "E10"
+title = "Delegation expiry recorded by the APF, then removed by an ordinary repair"
+topology = "../topologies/three-agents.toml"
+hypothesis = """(H1) Before any kernel step after a reader's delegation expires, nothing is \
+recorded and the group is not fenced. (H2) The first release attempt after the expiry is \
+refused as fenced, and the APF records the expiry as one ledger event although that \
+release failed. (H3) An ordinary repair then removes the expired reader and reopens the \
+group; later messages reach the remaining readers only. Before R-12 the group stalled: \
+every release failed and no repair could be staged. (H4) The oracle accepts the trace, in \
+which the expiry is the reader's denials."""
+
+# ---------------------------------------------------------------- A: bring-up
+[[step]]
+do = "genesis"
+name = "A1 alice founds the group"
+agent = "alice"
+
+[[step]]
+do = "delegate"
+name = "A2 delegate bob: read, write, admit (long-lived)"
+by = "alice"
+subject = "bob"
+rights = ["read", "write", "admit"]
+
+[[step]]
+do = "delegate"
+name = "A3 delegate carol: read, write, admit for 45 s"
+by = "alice"
+subject = "carol"
+rights = ["read", "write", "admit"]
+ttl_secs = 45
+
+[[step]]
+do = "admit"
+name = "A4 admit bob"
+by = "alice"
+subject = "bob"
+
+[[step]]
+do = "admit"
+name = "A5 admit carol"
+by = "alice"
+subject = "carol"
+
+[[step]]
+do = "send"
+name = "A6 alice sends m1 while carol is valid"
+agent = "alice"
+label = "m1"
+text = "m1: before the expiry"
+
+[[step]]
+do = "quiesce"
+name = "A7 drain"
+
+[[step]]
+do = "check.delivered"
+name = "A8 carol received m1"
+agent = "carol"
+ops = ["m1"]
+exact = false
+
+# ------------------------------------------------------------- B: expiry (H1)
+[[step]]
+do = "wait"
+name = "B1 wait past carol's expiry"
+seconds = 47
+
+[[step]]
+do = "check.kernel_events"
+name = "B2 no kernel step yet: no expiry recorded"
+kind = "expire"
+count = 0
+
+[[step]]
+do = "check.apf"
+name = "B3 not fenced, carol still in the roster"
+read_fenced = false
+roster = ["alice", "bob", "carol"]
+
+# ------------------------------------------------- C: the next step records it (H2)
+[[step]]
+do = "send"
+name = "C1 alice's release reaches the APF kernel: refused as fenced"
+agent = "alice"
+text = "must not be released"
+expect = "read_fenced"
+
+[[step]]
+do = "check.kernel_events"
+name = "C2 the APF recorded one expire event, kept although the release failed"
+kind = "expire"
+count = 1
+last = true
+
+[[step]]
+do = "check.apf"
+name = "C3 fenced, carol still in the roster"
+read_fenced = true
+roster = ["alice", "bob", "carol"]
+
+# ----------------------------------------------------------- D: repair (H3)
+[[step]]
+do = "repair"
+name = "D1 alice's ordinary repair removes carol and reopens the group"
+by = "alice"
+expect_removed = ["carol"]
+check_ack_policy = true
+
+[[step]]
+do = "check.apf"
+name = "D2 open again, carol removed"
+read_fenced = false
+roster = ["alice", "bob"]
+
+[[step]]
+do = "send"
+name = "D3 alice sends m2"
+agent = "alice"
+label = "m2"
+text = "m2: after the repair"
+
+[[step]]
+do = "quiesce"
+name = "D4 drain"
+
+[[step]]
+do = "check.delivered"
+name = "D5 bob received m2"
+agent = "bob"
+ops = ["m2"]
+exact = false
+
+[[step]]
+do = "check.not_delivered"
+name = "D6 carol did not receive m2"
+agent = "carol"
+ops = ["m2"]
+
+# ----------------------------------------------------------- E: verification (H4)
+[[step]]
+do = "check.frontiers"
+name = "E1 alice and bob are on the APF frontier"
+agents = ["alice", "bob"]
+
+[[step]]
+do = "check.exactly_once"
+name = "E2 no delivery without APF consumption"
+
+[[step]]
+do = "check.oracle"
+name = "E3 the oracle accepts the trace"
+
+[[step]]
+do = "check.broken_controls"
+name = "E4 the oracle rejects the broken controls built on carol's denial"
+revoked_reader = "carol"
+writer = "alice"
+minimum = 3
+
+[[step]]
+do = "check.no_errors"
+name = "E5 the honest agents logged no processing error"
+agents = ["alice", "bob"]

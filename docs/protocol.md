@@ -45,7 +45,7 @@ any request, with no fallback (C-40).
 | `GET /v1/info` | none | `{group, root, state: waiting\|pending\|ready, suite, apf_public_key, apf_key_id, entropy}`; `suite` is `pq` or `classical` once genesis began |
 | `GET /v1/state` | none | Policy view: `{group, epoch, branch, policy_revision, read_fenced, repair_pending, roster, grants}` |
 | `POST /v1/request` | none (signed) | `{actor, sequence, body, signature}` → the adapter result. `body` is the hex of the exact signed JSON bytes, `signature` the Ed25519 signature over `RequestTBS` (contract §4.8). |
-| `POST /v1/genesis/begin` | bootstrap | `{group, root, root_key}` → `{apf_public_key, founder_certificate, acc_context}` |
+| `POST /v1/genesis/begin` | bootstrap | `{group, root, root_key}` → `{apf_public_key, founder_certificate, apf_anchor}` |
 | `POST /v1/genesis/complete` | bootstrap | `{group_info, ratchet_tree}` → `{epoch, branch}` |
 | `GET /control/checkpoint` | control | Full kernel checkpoint, history included |
 | `GET /control/trace` | control | `{trace}`: the C-37 trace contract v2 export |
@@ -120,6 +120,8 @@ Control API (control token):
 | `POST /control/join` | Candidate: prepare, certify and publish a KeyPackage |
 | `POST /control/add` | `{subject}`: admit a published KeyPackage |
 | `POST /control/repair` | Plan, commit, publish and confirm a repair |
+| `POST /control/repair_with_extensions` | Hostile (E9): the planned repair plus a GroupContextExtensions proposal that repeats the current extensions; the APF must refuse it (R-11), and the staged commit is discarded |
+| `GET /control/anchor` | `{anchors, last_ack}`: the `apf_anchor` payloads of the member's current GroupContext (hex, from its exported GroupInfo) and the canonical ack it last merged or joined under, `{kind, epoch, policy_revision, policy_digest}` (R-11) |
 | `POST /control/rekey` | `{right, generation}`: after an offer, commit a new key |
 | `POST /control/sync` | Apply the handshake log now; returns the status |
 | `POST /control/adversary` | `{retain}`: retained key adversary mode |

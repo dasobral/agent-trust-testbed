@@ -366,7 +366,22 @@ class Runner:
             "request", {"body": step["body"]}))
 
     def do_repair(self, step):
+        before = self.tb.apf.call("GET", "/control/checkpoint")
         result = self._expect(step, lambda: self.tb.agent(step["by"]).control("repair"))
+        if step.get("check_ack_policy") and step.get("expect", "ok") == "ok":
+            # R-11 (c): the committer's stored repair ack carries the APF's policy at the
+            # canonical step, at or above the fence revision that the repair answers.
+            ack = self.tb.agent(step["by"]).control("anchor", method="GET")["last_ack"] or {}
+            fence = before.get("fence_revision")
+            problems = []
+            if ack.get("kind") != "repair":
+                problems.append(f"last ack kind {ack.get('kind')}, expected repair")
+            if fence is None or ack.get("policy_revision", -1) < fence:
+                problems.append(f"ack policy_revision {ack.get('policy_revision')} below fence {fence}")
+            if problems:
+                raise StepFailure("; ".join(problems))
+            result["ack_policy_revision"] = ack["policy_revision"]
+            result["fence_revision_before"] = fence
         if "expect_removed" in step and sorted(result.get("removed", [])) != sorted(step["expect_removed"]):
             raise StepFailure(f"expected removed {step['expect_removed']}, got {result.get('removed')}")
         if step.get("expect", "ok") == "ok":
@@ -380,6 +395,20 @@ class Runner:
             if "expect_evidence" in step and evidence != step["expect_evidence"]:
                 raise StepFailure(f"expected evidence {step['expect_evidence']}, got {evidence}")
         return result
+
+    def do_repair_with_extensions(self, step):
+        """R-11 (b): a repair that also carries a GroupContextExtensions proposal."""
+        before = self.tb.apf.call("GET", "/v1/state")
+        result = self._expect(step, lambda: self.tb.agent(step["by"]).control("repair_with_extensions"))
+        after = self.tb.apf.call("GET", "/v1/state")
+        if step.get("expect", "ok") != "ok" and after != before:
+            raise StepFailure(f"the refused commit changed the APF state: {before} -> {after}")
+        return result
+
+    def do_wait(self, step):
+        """Waits ``seconds`` of wall-clock time (for example past a delegation's expiry)."""
+        time.sleep(float(step["seconds"]))
+        return {"waited": step["seconds"]}
 
     def _evidence(self):
         for status in self._statuses().values():
@@ -855,6 +884,64 @@ class Runner:
         if problems:
             raise StepFailure("; ".join(problems))
         return {k: state[k] for k in ("roster", "epoch", "policy_revision", "read_fenced", "repair_pending")}
+
+    def do_check_anchor(self, step):
+        """R-11 (a) and (c) at every member: exactly one ``apf_anchor``, the same bytes at
+        every member and equal to the bytes recorded under ``record``/``same_as``; and,
+        with ``ack_kind``, a stored ack of that kind whose policy revision and digest are
+        the APF's current ones."""
+        state = self.tb.apf.call("GET", "/control/checkpoint")
+        names = step.get("agents") or self._members()
+        seen, problems = {}, []
+        for name in names:
+            view = self.tb.agent(name).control("anchor", method="GET")
+            if len(view["anchors"]) != 1:
+                problems.append(f"{name} has {len(view['anchors'])} apf_anchor extensions")
+                continue
+            seen[name] = view["anchors"][0]
+            ack = view.get("last_ack")
+            if "ack_kind" in step:
+                if ack is None:
+                    problems.append(f"{name} holds no ack")
+                else:
+                    if ack["kind"] != step["ack_kind"]:
+                        problems.append(f"{name} last ack kind {ack['kind']}, expected {step['ack_kind']}")
+                    if ack["policy_revision"] != state["policy_revision"]:
+                        problems.append(f"{name} ack policy_revision {ack['policy_revision']}, "
+                                        f"APF {state['policy_revision']}")
+                    if ack["policy_digest"] != state["policy_digest"]:
+                        problems.append(f"{name} ack policy_digest differs from the APF's")
+        if len(set(seen.values())) > 1:
+            problems.append(f"members disagree on apf_anchor: {seen}")
+        anchor = next(iter(seen.values()), None)
+        if "record" in step:
+            self.artifacts.setdefault("anchors", {})[step["record"]] = anchor
+        if "same_as" in step:
+            recorded = self.artifacts.get("anchors", {}).get(step["same_as"])
+            if recorded is None:
+                raise StepFailure(f"no anchor recorded as {step['same_as']!r}")
+            if anchor != recorded:
+                problems.append(f"apf_anchor changed since {step['same_as']}: {recorded} -> {anchor}")
+        if problems:
+            raise StepFailure("; ".join(problems))
+        return {"anchor": anchor, "agents": names, "policy_revision": state["policy_revision"]}
+
+    def do_check_kernel_events(self, step):
+        """The APF kernel history holds exactly ``count`` events of ``kind`` (R-12:
+        ``expire``); with ``last``, the last event is of that kind."""
+        checkpoint = self.tb.apf.call("GET", "/control/checkpoint")
+        kinds = [entry["event"]["kind"] for entry in checkpoint.get("history", [])]
+        count = kinds.count(step["kind"])
+        problems = []
+        if "count" in step and count != step["count"]:
+            problems.append(f"{count} {step['kind']} events, expected {step['count']}")
+        if step.get("last") and (not kinds or kinds[-1] != step["kind"]):
+            problems.append(f"the last kernel event is {kinds[-1] if kinds else None}, expected {step['kind']}")
+        if problems:
+            raise StepFailure("; ".join(problems))
+        return {"kind": step["kind"], "count": count, "last": kinds[-1] if kinds else None,
+                "read_fenced": checkpoint.get("read_fenced"),
+                "fence_revision": checkpoint.get("fence_revision")}
 
     def do_check_frontiers(self, step):
         state = self.tb.apf.call("GET", "/v1/state")

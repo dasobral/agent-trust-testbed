@@ -120,7 +120,7 @@ numbers refer to `docs/adapter-contract.md` in agent-trust.
 1. `attctl` calls `POST /control/genesis` on the root agent.
 2. The root sidecar sends its public key to `POST /v1/genesis/begin` with the
    bootstrap token. The APF checks the configured group and root, draws the APF key
-   from its entropy source and returns the founder certificate and `acc_context`.
+   from its entropy source and returns the founder certificate and `apf_anchor`.
 3. The root founds the MLS group (`ClientEndpoint::found`) and sends the GroupInfo
    and ratchet tree to `POST /v1/genesis/complete`. The APF builds its sequencer,
    validates the group and calls kernel `init`.

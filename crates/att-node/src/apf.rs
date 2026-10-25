@@ -253,7 +253,7 @@ impl Apf {
         let response = json!({
             "apf_public_key": hex::encode(pending.apf_public_key()),
             "founder_certificate": hex::encode(pending.founder_certificate()),
-            "acc_context": hex::encode(pending.acc_context()),
+            "apf_anchor": hex::encode(pending.apf_anchor()),
         });
         *phase = Phase::Pending(Box::new(pending));
         config::log(

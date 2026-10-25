@@ -43,8 +43,11 @@ use agent_trust::entropy::{DurableLabProvider, EntropyConfig, LabEntropy};
 use agent_trust::suite::Suite;
 use agent_trust::wire::{
     operation_digest, CanonicalAck, Envelope, Frontier, ReleaseCertificate, Right, SignedStructure,
+    APF_ANCHOR_EXTENSION_TYPE,
 };
-use openmls::prelude::{MlsMessageIn, ProcessedMessageContent};
+use openmls::prelude::{
+    BasicCredential, Extension, MlsMessageBodyIn, MlsMessageIn, ProcessedMessageContent,
+};
 use openmls_basic_credential::SignatureKeyPair;
 use openmls_traits::OpenMlsProvider;
 use serde_json::{json, Map, Value};
@@ -484,6 +487,8 @@ impl Agent {
                     ("POST", "join") => self.join(),
                     ("POST", "add") => self.add(body),
                     ("POST", "repair") => self.repair(),
+                    ("GET", "anchor") => self.anchor(),
+                    ("POST", "repair_with_extensions") => self.repair_with_extensions(),
                     ("POST", "rekey") => self.rekey(body),
                     ("POST", "sync") => self.catch_up().map(|()| self.status()),
                     ("POST", "adversary") => self.set_adversary(body),
@@ -664,7 +669,7 @@ impl Agent {
             identity,
             provider,
             &hex_field(&begun, "founder_certificate")?,
-            &hex_field(&begun, "acc_context")?,
+            &hex_field(&begun, "apf_anchor")?,
             &apf_public,
         ) {
             Ok(endpoint) => endpoint,
@@ -804,8 +809,8 @@ impl Agent {
             .iter()
             .filter_map(|name| name.as_str().map(str::to_owned))
             .collect();
-        let acc_context = hex_field(&plan, "acc_context")?;
-        let staged = self.endpoint_mut()?.stage_repair(&removed, &acc_context)?;
+        // R-11: the plan carries no anchor; the repair is Removes and a path only.
+        let staged = self.endpoint_mut()?.stage_repair(&removed)?;
         let (frontier, ack) = self.submit("repair", &staged.parent, &staged.commit)?;
         self.endpoint_mut()?.apply_ack(&staged.commit, &ack)?;
         let index = self.publish_handshake(json!({
@@ -818,6 +823,89 @@ impl Agent {
             "removed": removed, "epoch": frontier.epoch, "branch": frontier.branch,
             "index": index, "opened": confirmed["opened"], "evidence": confirmed["evidence"],
         }))
+    }
+
+    /// R-11 observation: the `apf_anchor` payloads in this member's current GroupContext
+    /// (read from its exported GroupInfo) and the canonical ack it last merged or joined
+    /// under, with that ack's policy revision and digest.
+    fn anchor(&mut self) -> Result<Value, String> {
+        let endpoint = self.endpoint_mut()?;
+        let bytes = endpoint.export_group_info()?;
+        let message = MlsMessageIn::tls_deserialize_exact(bytes.as_slice())
+            .map_err(|error| format!("malformed: group info {error:?}"))?;
+        let MlsMessageBodyIn::GroupInfo(info) = message.extract() else {
+            return Err("malformed: not a GroupInfo".into());
+        };
+        let anchors: Vec<String> = info
+            .group_context()
+            .extensions()
+            .iter()
+            .filter_map(|extension| match extension {
+                Extension::Unknown(t, payload) if *t == APF_ANCHOR_EXTENSION_TYPE => {
+                    Some(hex::encode(&payload.0))
+                }
+                _ => None,
+            })
+            .collect();
+        let ack = endpoint.last_ack().map(|ack| {
+            json!({
+                "kind": format!("{:?}", ack.kind).to_lowercase(),
+                "epoch": ack.successor.epoch,
+                "policy_revision": ack.policy_revision,
+                "policy_digest": hex::encode(&ack.policy_digest),
+            })
+        });
+        Ok(json!({ "anchors": anchors, "last_ack": ack }))
+    }
+
+    /// Hostile variant of `repair` (R-11 (b)): the planned Removes and a path, plus a
+    /// GroupContextExtensions proposal that repeats the current extensions exactly,
+    /// built through raw OpenMLS. The APF must refuse it; the staged commit is discarded.
+    fn repair_with_extensions(&mut self) -> Result<Value, String> {
+        self.catch_up()?;
+        let plan = self.request(json!({ "command": "repair_plan" }))?;
+        let removed: Vec<String> = plan["removed"]
+            .as_array()
+            .ok_or("malformed: repair plan removed")?
+            .iter()
+            .filter_map(|name| name.as_str().map(str::to_owned))
+            .collect();
+        let endpoint = self.endpoint_mut()?;
+        let parent = endpoint.frontier()?;
+        let commit = {
+            let (group, provider, signer) = endpoint.mls_parts_mut();
+            let indices: Vec<_> = group
+                .members()
+                .filter(|member| {
+                    BasicCredential::try_from(member.credential.clone())
+                        .map(|basic| removed.iter().any(|r| r.as_bytes() == basic.identity()))
+                        .unwrap_or(false)
+                })
+                .map(|member| member.index)
+                .collect();
+            let extensions = group.public_group().group_context().extensions().clone();
+            let bundle = group
+                .commit_builder()
+                .propose_removals(indices)
+                .propose_group_context_extensions(extensions)
+                .map_err(|error| format!("malformed: {error:?}"))?
+                .force_self_update(true)
+                .load_psks(provider.storage())
+                .map_err(|error| format!("malformed: {error:?}"))?
+                .build(provider.rand(), provider.crypto(), signer, |_| true)
+                .map_err(|error| format!("malformed: {error:?}"))?
+                .stage_commit(provider)
+                .map_err(|error| format!("malformed: {error:?}"))?;
+            tls_codec::Serialize::tls_serialize_detached(bundle.commit())
+                .map_err(|error| format!("malformed: {error:?}"))?
+        };
+        let result = self.submit("repair", &parent, &commit);
+        // Whatever the APF answers, this hostile commit is never merged here.
+        if let Ok(endpoint) = self.endpoint_mut() {
+            let _ = endpoint.discard_pending();
+        }
+        let (frontier, _) = result?;
+        Ok(json!({ "accepted": true, "epoch": frontier.epoch, "removed": removed }))
     }
 
     fn confirm(&mut self) -> Result<Value, String> {
