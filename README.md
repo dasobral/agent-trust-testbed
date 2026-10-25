@@ -49,22 +49,19 @@ classical stack. E6 (a live Entropy Core) is the one planned experiment not run:
 a reachable endpoint. In every run here the QRNG service is a **mock** (OS RNG bytes): no
 quantum origin is claimed.
 
-Branch `feat/r11-r12` of this repository follows agent-trust `feat/r12-expiry`
-(`e774ba2`): R-11 (D-11, the policy binding moves into the canonical ack) and R-12
-(D-16, delegation expiry is a ledger event), which are not yet on agent-trust `main`.
-It adds E9 and E10 for them. On this branch every local experiment passes at `6481e8e`
-([`results/*/2026-10-25-local-r11-r12`](results/)), and GitHub CI run `40226788501` passes
-the local, compose and k3s jobs, E9 and E10 on all three. Switch the dependency back to
-`main` once they merge.
-
 Stack under test: each library follows a branch, and `Cargo.lock` records the commit:
-agent-trust `main` (`6ec41e8`: the durable provider, C-41, the post quantum suite, C-42,
-and D-14, `pq-preferred` for a real Entropy Core), OpenMLS fork branch
+agent-trust `main` (`e774ba2`: the durable provider, C-41, the post quantum suite, C-42,
+D-14 `pq-preferred` for a real Entropy Core, R-11, the policy binding in the canonical
+ack, and R-12, delegation expiry as a ledger event), OpenMLS fork branch
 `agent-trust/integration` (`dd33278`) with the feature `draft-ietf-mls-pq-ciphersuites`,
 openmls-qrand `main` (`868f058`: post quantum TLS and the negotiated key exchange
-report). `cargo update` takes the latest. The recorded reports name testbed commit
-`b7e9fa3`, which pinned agent-trust `f69b7fa` and openmls-qrand `66026082`; the later
-changes affect only the link to a real Entropy Core, which no recorded experiment uses.
+report). `cargo update` takes the latest. E9 and E10 cover R-11 and R-12. With this stack
+every local experiment passes at testbed `6481e8e`
+([`results/*/2026-10-25-local-r11-r12`](results/)), and GitHub CI run `40226788501`
+passes the local, compose and k3s jobs, with E9 and E10 on all three. Those runs resolved
+agent-trust through branch `feat/r12-expiry` at the same commit `e774ba2`, which was
+then fast-forwarded into agent-trust `main`. The other reports of 2026-10-25 name
+testbed `b7e9fa3`, which pinned agent-trust `f69b7fa` and openmls-qrand `66026082`.
 
 Findings on the stack, with proposals: [`docs/findings.md`](docs/findings.md). The
 most important: the kernel's cost per request grows with the square of its history
