@@ -47,14 +47,14 @@ classical stack. E6 (a live Entropy Core) is the one planned experiment not run:
 a reachable endpoint. In every run here the QRNG service is a **mock** (OS RNG bytes): no
 quantum origin is claimed.
 
-Stack under test: agent-trust `c87cf85` (branch `feat/ec-pq-preferred`: `main` at
-`f69b7fa`, with the durable provider, C-41, and the post quantum suite, C-42, plus D-14,
-`pq-preferred` for a real Entropy Core), OpenMLS fork `dd33278` with the feature
-`draft-ietf-mls-pq-ciphersuites`, openmls-qrand `868f058` (branch `feat/kx-probe`:
-`main` at `6602608` plus the negotiated key exchange report). The recorded reports name
-testbed commit `b7e9fa3`, which pinned agent-trust `f69b7fa` and openmls-qrand
-`66026082`; D-14 changes only the link to a real Entropy Core, which no recorded
-experiment uses.
+Stack under test: each library follows a branch, and `Cargo.lock` records the commit:
+agent-trust `main` (`6ec41e8`: the durable provider, C-41, the post quantum suite, C-42,
+and D-14, `pq-preferred` for a real Entropy Core), OpenMLS fork branch
+`agent-trust/integration` (`dd33278`) with the feature `draft-ietf-mls-pq-ciphersuites`,
+openmls-qrand `main` (`868f058`: post quantum TLS and the negotiated key exchange
+report). `cargo update` takes the latest. The recorded reports name testbed commit
+`b7e9fa3`, which pinned agent-trust `f69b7fa` and openmls-qrand `66026082`; the later
+changes affect only the link to a real Entropy Core, which no recorded experiment uses.
 
 Findings on the stack, with proposals: [`docs/findings.md`](docs/findings.md). The
 most important: the kernel's cost per request grows with the square of its history
@@ -72,7 +72,7 @@ was classical) is implemented.
  L0  openmls-qrand     QRNG Open API randomness, fail closed  ──▶  qrng-mock or Entropy Core
 ```
 
-- **L0 to L2 are libraries**, pinned once in [`Cargo.toml`](Cargo.toml). The testbed adds
+- **L0 to L2 are libraries**, declared once in [`Cargo.toml`](Cargo.toml). The testbed adds
   no cryptography and no authorization logic: every decision is agent-trust's.
 - **L3 cuts L2 at its party boundaries.** `att-node apf` wraps the agent-trust
   `Adapter`. `att-node agent` wraps one `ClientEndpoint` and is the only holder of its

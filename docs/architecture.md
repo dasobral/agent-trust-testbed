@@ -19,17 +19,18 @@ contract each network flow implements.
                        qrng-mock service, or a real endpoint such as Quside Entropy Core
 ```
 
-| Layer | Repository | Pinned at | What it gives the layer above |
+| Layer | Repository | Branch (commit in `Cargo.lock`, 2026-10-25) | What it gives the layer above |
 |---|---|---|---|
-| L0 | `dasobral/openmls-qrand` | `868f058` (branch `feat/kx-probe`: `main` plus the negotiated key exchange report) | `OpenMlsRand` over a QRNG Open API endpoint, over post quantum TLS (`X25519MLKEM768`); fail closed; reports the negotiated group |
-| L1 | `dasobral/openmls` (`agent-trust/integration`) | `dd33278`, feature `draft-ietf-mls-pq-ciphersuites` | MLS groups (including the post quantum suite `0x0052`), the public sequencer, staged KeyPackages, a DRBG seeded from L0 |
-| L2 | `dasobral/agent-trust` | `c87cf85` (branch `feat/ec-pq-preferred`: `main` with the durable provider, F-2 and C-41, and the post quantum suite, F-9 and C-42, plus D-14, `pq-preferred` for a real Entropy Core) | The APF kernel and adapter, the client endpoint, the trace export and the oracle; the `pq` suite (ML-DSA-44 and X-Wing) by default |
+| L0 | `dasobral/openmls-qrand` | `main` (`868f058`: post quantum TLS and the negotiated key exchange report) | `OpenMlsRand` over a QRNG Open API endpoint, over post quantum TLS (`X25519MLKEM768`); fail closed; reports the negotiated group |
+| L1 | `dasobral/openmls` (`agent-trust/integration`) | `agent-trust/integration` (`dd33278`), feature `draft-ietf-mls-pq-ciphersuites` | MLS groups (including the post quantum suite `0x0052`), the public sequencer, staged KeyPackages, a DRBG seeded from L0 |
+| L2 | `dasobral/agent-trust` | `main` (`6ec41e8`: the durable provider, F-2 and C-41; the post quantum suite, F-9 and C-42; D-14, `pq-preferred` for a real Entropy Core) | The APF kernel and adapter, the client endpoint, the trace export and the oracle; the `pq` suite (ML-DSA-44 and X-Wing) by default |
 | L3 | this repository, `crates/att-node` | | The L2 parties as separate network processes |
 | L4 | this repository, `controller/attctl` | | Deployment, control, experiments, evidence |
 
-All pins live in one place: `[workspace.dependencies]` in `Cargo.toml`. agent-trust
-pins its own OpenMLS and openmls-qrand revisions, and `Cargo.lock` records the
-resolved graph. The control plane loads the oracle from the agent-trust checkout
+All dependencies live in one place: `[workspace.dependencies]` in `Cargo.toml`. Each
+follows a branch (agent-trust `main`, which follows openmls-qrand `main` and the OpenMLS
+fork branch `agent-trust/integration`), so `cargo update` takes the latest, and
+`Cargo.lock` records the exact commits of the resolved graph. The control plane loads the oracle from the agent-trust checkout
 that Cargo resolved (`cargo metadata`), so the services and the oracle always come
 from the same revision. `report.json` of every run records the revisions it used.
 

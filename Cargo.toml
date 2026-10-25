@@ -9,14 +9,15 @@ license = "MIT"
 repository = "https://github.com/dasobral/agent-trust-testbed"
 authors = ["Daniel Sobral Blanco <dasobral93@gmail.com>"]
 
-# The Agent Trust stack, pinned in one place. Change these three revisions together:
-# agent-trust pins its own OpenMLS fork revision and openmls-qrand revision.
+# The Agent Trust stack, in one place. Each dependency follows a branch, so a fresh
+# resolve or `cargo update` takes the latest; Cargo.lock records the exact commits.
+# agent-trust follows the same OpenMLS fork branch and openmls-qrand main.
 [workspace.dependencies]
-agent-trust = { git = "https://github.com/dasobral/agent-trust.git", rev = "c87cf85085e3feeeb690cea1a6d0b8bed28d8b64" }
-openmls = { git = "https://github.com/dasobral/openmls.git", rev = "dd33278099426c2ffc8a4ec686e88bde1f937963", features = ["draft-ietf-mls-pq-ciphersuites"] }
-openmls_traits = { git = "https://github.com/dasobral/openmls.git", rev = "dd33278099426c2ffc8a4ec686e88bde1f937963", features = ["draft-ietf-mls-pq-ciphersuites"] }
-openmls_basic_credential = { git = "https://github.com/dasobral/openmls.git", rev = "dd33278099426c2ffc8a4ec686e88bde1f937963", features = ["clonable", "draft-ietf-mls-pq-ciphersuites"] }
+agent-trust = { git = "https://github.com/dasobral/agent-trust.git", branch = "main" }
+openmls = { git = "https://github.com/dasobral/openmls.git", branch = "agent-trust/integration", features = ["draft-ietf-mls-pq-ciphersuites"] }
+openmls_traits = { git = "https://github.com/dasobral/openmls.git", branch = "agent-trust/integration", features = ["draft-ietf-mls-pq-ciphersuites"] }
+openmls_basic_credential = { git = "https://github.com/dasobral/openmls.git", branch = "agent-trust/integration", features = ["clonable", "draft-ietf-mls-pq-ciphersuites"] }
 
 # Same unification as agent-trust: openmls-qrand depends on crates.io openmls_traits.
 [patch.crates-io]
-openmls_traits = { git = "https://github.com/dasobral/openmls.git", rev = "dd33278099426c2ffc8a4ec686e88bde1f937963" }
+openmls_traits = { git = "https://github.com/dasobral/openmls.git", branch = "agent-trust/integration" }
