@@ -1,0 +1,17 @@
+{"entropy":"qrng","event":"listening","group":"lab","listen":"127.0.0.1:45869","role":"apf","ts":1792955457}
+{"event":"genesis_begin","group":"lab","role":"apf","root":"alice","ts":1792955458}
+{"epoch":0,"event":"genesis_complete","role":"apf","ts":1792955459}
+{"actor":"alice","command":"delegate","event":"request","history":1,"outcome":"ok","role":"apf","sequence":1,"ts":1792955459,"us":24071}
+{"actor":"alice","command":"delegate","event":"request","history":2,"outcome":"ok","role":"apf","sequence":2,"ts":1792955459,"us":24037}
+{"actor":"bob","command":"admission_certificate","event":"request","history":3,"outcome":"ok","role":"apf","sequence":1,"ts":1792955459,"us":8727}
+{"actor":"alice","command":"submit_commit","event":"request","history":3,"outcome":"ok","role":"apf","sequence":3,"ts":1792955459,"us":34533}
+{"actor":"carol","command":"admission_certificate","event":"request","history":4,"outcome":"ok","role":"apf","sequence":1,"ts":1792955460,"us":9945}
+{"actor":"alice","command":"submit_commit","event":"request","history":4,"outcome":"ok","role":"apf","sequence":4,"ts":1792955460,"us":38366}
+{"actor":"alice","command":"allocate","event":"request","history":5,"outcome":"ok","role":"apf","sequence":5,"ts":1792955461,"us":26475}
+{"actor":"alice","command":"release","event":"request","history":6,"outcome":"ok","role":"apf","sequence":6,"ts":1792955461,"us":27758}
+{"actor":"alice","command":"persist","event":"request","history":7,"outcome":"ok","role":"apf","sequence":7,"ts":1792955461,"us":27617}
+{"actor":"alice","command":"emit","event":"request","history":8,"outcome":"ok","role":"apf","sequence":8,"ts":1792955461,"us":9233}
+{"actor":"carol","command":"consume","event":"request","history":8,"outcome":"ok","role":"apf","sequence":2,"ts":1792955461,"us":55418}
+{"actor":"bob","command":"consume","event":"request","history":9,"outcome":"ok","role":"apf","sequence":2,"ts":1792955461,"us":37975}
+{"actor":"alice","command":"allocate","event":"request","history":10,"outcome":"ok","role":"apf","sequence":9,"ts":1792955509,"us":27941}
+{"actor":"alice","command":"release","event":"request","history":11,"outcome":"unauthorized","role":"apf","sequence":10,"ts":1792955509,"us":18752}

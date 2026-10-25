@@ -29,6 +29,8 @@ every TLS link between services is ML-DSA-44 over the hybrid key exchange
 | E5-classical | E5 in the classical suite | PASS | | |
 | [E7](docs/experiments/E7-confused-deputy.md) | Confused deputy: invocation provenance and attenuation | PASS | PASS | PASS |
 | [E8](docs/experiments/E8-suites.md) | The same scenario in the `pq` and `classical` suites, with sizes | PASS | PASS | PASS |
+| [E9](docs/experiments/E9-ack-policy.md) | R-11: static `apf_anchor`, policy in the canonical ack, a repair carrying GroupContextExtensions refused | PASS | | |
+| [E10](docs/experiments/E10-delegation-expiry.md) | R-12: a delegated reader expires; the APF records it, fences, and a repair removes it (fails as predicted without R-12) | PASS | | |
 | [K8S](deploy/k3s/README.md) | NetworkPolicy isolation of the services | | | PASS |
 
 E5 fails in the `pq` suite because of finding F-8: the kernel keeps every envelope in
@@ -46,6 +48,11 @@ k3s with containerd). The stability series of 2026-10-24 (60 of 60,
 classical stack. E6 (a live Entropy Core) is the one planned experiment not run: it needs
 a reachable endpoint. In every run here the QRNG service is a **mock** (OS RNG bytes): no
 quantum origin is claimed.
+
+Branch `feat/r11-r12` of this repository follows agent-trust `feat/r12-expiry`
+(`e774ba2`): R-11 (D-11, the policy binding moves into the canonical ack) and R-12
+(D-16, delegation expiry is a ledger event), which are not yet on agent-trust `main`.
+It adds E9 and E10 for them. Switch the dependency back to `main` once they merge.
 
 Stack under test: each library follows a branch, and `Cargo.lock` records the commit:
 agent-trust `main` (`6ec41e8`: the durable provider, C-41, the post quantum suite, C-42,
