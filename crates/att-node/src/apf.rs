@@ -202,7 +202,14 @@ impl Apf {
             let begin = std::time::Instant::now();
             let result = adapter.handle(&request);
             micros = begin.elapsed().as_micros() as u64;
-            result
+            // agent-trust R-13d.3 and R-13d.4: the APF-signed history head after the
+            // request, which the agent sends back as `known_head` in its next request.
+            result.map(|mut value| {
+                if let (Ok(head), Some(fields)) = (adapter.history_head(), value.as_object_mut()) {
+                    fields.insert("history_head".into(), json!(hex::encode(head)));
+                }
+                value
+            })
         });
         if let Ok(mut samples) = self.samples.lock() {
             if samples.len() >= SAMPLE_LIMIT {

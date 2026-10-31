@@ -91,3 +91,21 @@ does not change it. Proposed correction, for approval:
 
 The testbed already avoids the one quadratic read that was its own: the APF's public
 view now reads the kernel's current state row instead of `checkpoint`.
+
+## After agent-trust R-13 (2026-10-31)
+
+agent-trust R-13 (D-17) fixes F-8, on branch `feat/r13-history`. E5 in the `pq` suite
+passes all 22 steps in 39 s (`results/E5/2026-10-31-local`, testbed `feat/r13-history`).
+The APF's median time per request stays at about 50 ms, from history 15 to 480 (`apf_p50_growth` 1.0 in every round):
+
+| Round | History | APF median | Round time |
+|---|---|---|---|
+| Clean round 1 (B1) | 15 → 94 | 54.6 ms | 4.4 s |
+| Under faults (C2) | 335 → 414 | 52.9 ms | 4.5 s |
+| After the repair (D3) | 418 → 480 | 48.3 ms | 3.5 s |
+
+The ≈ 50 ms is the APF's whole request, ML-DSA signatures and MLS processing included.
+The kernel alone takes 0.34 ms per request at 100 000 events
+(`evidence/f8-bench/scale-r13d2.txt` in agent-trust). The sidecar now sends `known_head`,
+and the APF returns the signed `history_head`, so a rolled-back APF is refused with
+`fork_detected` at the next request of an agent that saw a later head.

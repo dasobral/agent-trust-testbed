@@ -25,7 +25,7 @@ every TLS link between services is ML-DSA-44 over the hybrid key exchange
 | [E2](docs/experiments/E2-entropy-outage.md) | QRNG outage: fail closed, change nothing, recover | PASS | PASS | PASS |
 | [E3](docs/experiments/E3-restarts.md) | APF and agent crashes, outages, offline members | PASS | PASS | PASS |
 | [E4](docs/experiments/E4-hostile-commits.md) | Forged, replayed, spliced, hidden and reordered commits | PASS | PASS | PASS |
-| [E5](docs/experiments/E5-scale.md) | Eight agents in parallel: latency, cost growth, safety (`pq` suite) | **FAIL** (F-8) | | |
+| [E5](docs/experiments/E5-scale.md) | Eight agents in parallel: latency, cost growth, safety (`pq` suite) | PASS (F-8 fixed, branch `feat/r13-history`) | | |
 | E5-classical | E5 in the classical suite | PASS | | |
 | [E7](docs/experiments/E7-confused-deputy.md) | Confused deputy: invocation provenance and attenuation | PASS | PASS | PASS |
 | [E8](docs/experiments/E8-suites.md) | The same scenario in the `pq` and `classical` suites, with sizes | PASS | PASS | PASS |
@@ -33,10 +33,12 @@ every TLS link between services is ML-DSA-44 over the hybrid key exchange
 | [E10](docs/experiments/E10-delegation-expiry.md) | R-12: a delegated reader expires; the APF records it, fences, and a repair removes it (fails as predicted without R-12) | PASS | PASS | PASS |
 | [K8S](deploy/k3s/README.md) | NetworkPolicy isolation of the services | | | PASS |
 
-E5 fails in the `pq` suite because of finding F-8: the kernel keeps every envelope in
+E5 failed in the `pq` suite because of finding F-8: the kernel kept every envelope in
 every history snapshot, and ML-DSA signatures make envelopes about seven times larger, so
-the APF slows down too fast for parallel sends (the sends time out). The F-8 fix needs
-approval. E5 in the classical suite passes.
+the APF slowed down too fast for parallel sends. agent-trust R-13 (D-17, branch
+`feat/r13-history`) fixes it. On that branch E5 in the `pq` suite passes in 39 s, with the
+APF's median time per request flat at about 50 ms from 15 to 480 history events
+(`results/E5/2026-10-31-local`). E5 in the classical suite passes too.
 
 Evidence (reports, traces, service logs) is in [`results/`](results/): the runs of
 2026-10-25 name the clean testbed commit `b7e9fa3`, the runs of 2026-10-24 the classical

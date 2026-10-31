@@ -1,0 +1,4478 @@
+{
+ "experiment": "E5",
+ "title": "Eight agents in parallel: latency, APF cost growth and safety at scale",
+ "hypothesis": "(H1) Admission, release and delivery keep working as the group grows to eight members; their cost is measured, not assumed. (H2) With all eight agents sending in parallel, with and without relay faults, every message reaches every reader exactly once and only after an APF consumption. (H3) A revocation and repair with seven continuing members completes and excludes the revoked member. (H4) The APF's time per request grows with its kernel history, because the kernel validates its whole hash chain of full snapshots on every request; E5 measures the growth. (H5) The oracle accepts the full trace.",
+ "result": "pass",
+ "started": 1793481549.3394668,
+ "seconds": 38.965,
+ "steps": [
+  {
+   "index": 0,
+   "do": "genesis",
+   "name": "A1 agent01 founds the group",
+   "status": "pass",
+   "detail": {
+    "branch": "4ce2320a28828585668df6b82d9297e89232e2b7a8a38bdf82f78d713b19ad78",
+    "epoch": 0
+   },
+   "seconds": 0.667
+  },
+  {
+   "index": 1,
+   "do": "admit_all",
+   "name": "A2 delegate and admit the seven other agents, one at a time",
+   "status": "pass",
+   "detail": {
+    "admitted": 7,
+    "admissions": [
+     {
+      "member": "agent02",
+      "group_size": 2,
+      "ms": 807.3
+     },
+     {
+      "member": "agent03",
+      "group_size": 3,
+      "ms": 1040.1
+     },
+     {
+      "member": "agent04",
+      "group_size": 4,
+      "ms": 1095.7
+     },
+     {
+      "member": "agent05",
+      "group_size": 5,
+      "ms": 1160.8
+     },
+     {
+      "member": "agent06",
+      "group_size": 6,
+      "ms": 1210.9
+     },
+     {
+      "member": "agent07",
+      "group_size": 7,
+      "ms": 1288.1
+     },
+     {
+      "member": "agent08",
+      "group_size": 8,
+      "ms": 1250.6
+     }
+    ]
+   },
+   "seconds": 8.123
+  },
+  {
+   "index": 2,
+   "do": "check.apf",
+   "name": "A3 eight members at epoch 7",
+   "status": "pass",
+   "detail": {
+    "roster": [
+     "agent01",
+     "agent02",
+     "agent03",
+     "agent04",
+     "agent05",
+     "agent06",
+     "agent07",
+     "agent08"
+    ],
+    "epoch": 7,
+    "policy_revision": 7,
+    "read_fenced": false,
+    "repair_pending": null
+   },
+   "seconds": 0.001
+  },
+  {
+   "index": 3,
+   "do": "check.frontiers",
+   "name": "A4 every agent is on the APF frontier",
+   "status": "pass",
+   "detail": {
+    "epoch": 7,
+    "agents": [
+     "agent01",
+     "agent02",
+     "agent03",
+     "agent04",
+     "agent05",
+     "agent06",
+     "agent07",
+     "agent08"
+    ]
+   },
+   "seconds": 0.006
+  },
+  {
+   "index": 4,
+   "do": "rounds",
+   "name": "B1 four rounds: all eight agents send one message each in parallel (32 messages, 224 deliveries)",
+   "status": "pass",
+   "detail": {
+    "rounds": [
+     {
+      "round": 1,
+      "seconds": 4.42,
+      "apf_requests": 88,
+      "history_from": 15,
+      "history_to": 94,
+      "apf_p50_ms": 54.6
+     },
+     {
+      "round": 2,
+      "seconds": 4.41,
+      "apf_requests": 88,
+      "history_from": 95,
+      "history_to": 174,
+      "apf_p50_ms": 46.4
+     },
+     {
+      "round": 3,
+      "seconds": 4.27,
+      "apf_requests": 88,
+      "history_from": 175,
+      "history_to": 254,
+      "apf_p50_ms": 52.4
+     },
+     {
+      "round": 4,
+      "seconds": 4.38,
+      "apf_requests": 88,
+      "history_from": 255,
+      "history_to": 334,
+      "apf_p50_ms": 52.6
+     }
+    ],
+    "apf_p50_growth": 1.0
+   },
+   "seconds": 17.48
+  },
+  {
+   "index": 5,
+   "do": "check.complete",
+   "name": "B2 every message reached its seven readers exactly once",
+   "status": "pass",
+   "detail": {
+    "pairs": 224,
+    "excluded": [],
+    "optional": 0
+   },
+   "seconds": 0.003
+  },
+  {
+   "index": 6,
+   "do": "check.exactly_once",
+   "name": "B3 no delivery without APF consumption",
+   "status": "pass",
+   "detail": {
+    "deliveries": 224,
+    "consumed": 224,
+    "lost_after_consume": 0
+   },
+   "seconds": 0.368
+  },
+  {
+   "index": 7,
+   "do": "check.metrics",
+   "name": "B4 latency without faults",
+   "status": "pass",
+   "detail": {
+    "send_ms": {
+     "n": 32,
+     "p50": 1089.5,
+     "p95": 1158.9,
+     "max": 1177.6
+    },
+    "delivery_ms": {
+     "n": 224,
+     "p50": 1649.5,
+     "p95": 2845,
+     "max": 3005
+    },
+    "admit_ms": {
+     "n": 7,
+     "p50": 1160.8,
+     "p95": 1250.6,
+     "max": 1288.1
+    },
+    "apf_ms_by_history": [
+     {
+      "history_up_to": 33,
+      "requests": 40,
+      "p50": 27.82
+     },
+     {
+      "history_up_to": 67,
+      "requests": 41,
+      "p50": 55.45
+     },
+     {
+      "history_up_to": 100,
+      "requests": 34,
+      "p50": 47.04
+     },
+     {
+      "history_up_to": 134,
+      "requests": 41,
+      "p50": 46.06
+     },
+     {
+      "history_up_to": 167,
+      "requests": 34,
+      "p50": 54.07
+     },
+     {
+      "history_up_to": 201,
+      "requests": 41,
+      "p50": 35.45
+     },
+     {
+      "history_up_to": 234,
+      "requests": 34,
+      "p50": 53.48
+     },
+     {
+      "history_up_to": 268,
+      "requests": 33,
+      "p50": 46.05
+     },
+     {
+      "history_up_to": 301,
+      "requests": 42,
+      "p50": 52.62
+     },
+     {
+      "history_up_to": 335,
+      "requests": 33,
+      "p50": 53.74
+     }
+    ]
+   },
+   "seconds": 0.005
+  },
+  {
+   "index": 8,
+   "do": "faults",
+   "name": "C1 relay drops 10%, duplicates 10%, reorders",
+   "status": "pass",
+   "detail": {
+    "drop": 10,
+    "duplicate": 10,
+    "reorder": true,
+    "seed": 3
+   },
+   "seconds": 0.0
+  },
+  {
+   "index": 9,
+   "do": "rounds",
+   "name": "C2 one round under faults",
+   "status": "pass",
+   "detail": {
+    "rounds": [
+     {
+      "round": 1,
+      "seconds": 4.49,
+      "apf_requests": 88,
+      "history_from": 335,
+      "history_to": 414,
+      "apf_p50_ms": 52.9
+     }
+    ],
+    "apf_p50_growth": 1.0
+   },
+   "seconds": 4.487
+  },
+  {
+   "index": 10,
+   "do": "check.complete",
+   "name": "C3 every message reached every reader exactly once despite the faults",
+   "status": "pass",
+   "detail": {
+    "pairs": 280,
+    "excluded": [],
+    "optional": 0
+   },
+   "seconds": 0.004
+  },
+  {
+   "index": 11,
+   "do": "check.rejections_are_duplicates",
+   "name": "C4 every refused copy was a duplicate",
+   "status": "pass",
+   "detail": {
+    "agent01": {
+     "undecryptable": 1
+    },
+    "agent02": {
+     "undecryptable": 3
+    },
+    "agent03": {
+     "undecryptable": 1
+    },
+    "agent04": {
+     "undecryptable": 1
+    },
+    "agent05": {
+     "undecryptable": 1
+    },
+    "agent06": {},
+    "agent07": {
+     "undecryptable": 1
+    },
+    "agent08": {
+     "undecryptable": 1
+    }
+   },
+   "seconds": 0.006
+  },
+  {
+   "index": 12,
+   "do": "revoke",
+   "name": "D1 agent01 revokes agent08's read right",
+   "status": "pass",
+   "detail": {
+    "read_fenced": true,
+    "revision": 415
+   },
+   "seconds": 0.046
+  },
+  {
+   "index": 13,
+   "do": "repair",
+   "name": "D2 repair with seven continuing members",
+   "status": "pass",
+   "detail": {
+    "branch": "5afb39d0a5322b2d27d44e54e4e299768bd7cb92396d067a12c78381f2ac6476",
+    "epoch": 8,
+    "evidence": "pair",
+    "index": 7,
+    "opened": false,
+    "removed": [
+     "agent08"
+    ],
+    "read_fenced_after": false
+   },
+   "seconds": 1.73
+  },
+  {
+   "index": 14,
+   "do": "rounds",
+   "name": "D3 one round from the seven continuing members",
+   "status": "pass",
+   "detail": {
+    "rounds": [
+     {
+      "round": 1,
+      "seconds": 3.54,
+      "apf_requests": 70,
+      "history_from": 418,
+      "history_to": 480,
+      "apf_p50_ms": 48.3
+     }
+    ],
+    "apf_p50_growth": 1.0
+   },
+   "seconds": 3.546
+  },
+  {
+   "index": 15,
+   "do": "check.agent",
+   "name": "D4 agent08 applied its own removal",
+   "status": "pass",
+   "detail": {
+    "membership": "removed",
+    "epoch": null,
+    "restarts": 0,
+    "skipped_entries": 6,
+    "future": 0,
+    "waiting": []
+   },
+   "seconds": 0.0
+  },
+  {
+   "index": 16,
+   "do": "check.complete",
+   "name": "D5 completeness over the whole run",
+   "status": "pass",
+   "detail": {
+    "pairs": 322,
+    "excluded": [],
+    "optional": 0
+   },
+   "seconds": 0.004
+  },
+  {
+   "index": 17,
+   "do": "check.exactly_once",
+   "name": "D6 no duplicate, no delivery without consumption, over the whole run",
+   "status": "pass",
+   "detail": {
+    "deliveries": 322,
+    "consumed": 322,
+    "lost_after_consume": 0
+   },
+   "seconds": 0.554
+  },
+  {
+   "index": 18,
+   "do": "check.oracle",
+   "name": "D7 the oracle accepts the full trace",
+   "status": "pass",
+   "detail": {
+    "oracle": "oracle.py",
+    "events": 559,
+    "kinds": {
+     "admit": 7,
+     "allocate": 47,
+     "allow": 21,
+     "confirm": 2,
+     "consume": 322,
+     "deny": 1,
+     "emit": 47,
+     "init": 1,
+     "persist": 47,
+     "recover": 15,
+     "release": 47,
+     "repair_open": 1,
+     "repair_stage": 1
+    }
+   },
+   "seconds": 0.635
+  },
+  {
+   "index": 19,
+   "do": "check.broken_controls",
+   "name": "D8 the oracle rejects the broken controls",
+   "status": "pass",
+   "detail": {
+    "rejected": {
+     "release after the read denial": "read_fenced",
+     "fence opened by API only (no repair commit)": "invalid_repair",
+     "fence opened without confirmation": "unconfirmed",
+     "repair that keeps the revoked reader": "invalid_repair",
+     "release cover that omits a reader": "unsound_cover",
+     "second envelope under one operation": "binding_mismatch",
+     "replayed consumption": "replay"
+    },
+    "skipped": [
+     "rekey that reuses another member's key"
+    ]
+   },
+   "seconds": 1.291
+  },
+  {
+   "index": 20,
+   "do": "check.entropy",
+   "name": "D9 every node drew from the QRNG service without failure",
+   "status": "pass",
+   "detail": {
+    "nodes": {
+     "apf": {
+      "bytes": 96,
+      "failures": 0,
+      "key_exchange": "none (plain HTTP)",
+      "post_quantum": false,
+      "requests": 3,
+      "source": "qrng"
+     },
+     "agent01": {
+      "bytes": 1032,
+      "failures": 0,
+      "key_exchange": "none (plain HTTP)",
+      "post_quantum": false,
+      "requests": 28,
+      "source": "qrng"
+     },
+     "agent02": {
+      "bytes": 216,
+      "failures": 0,
+      "key_exchange": "none (plain HTTP)",
+      "post_quantum": false,
+      "requests": 11,
+      "source": "qrng"
+     },
+     "agent03": {
+      "bytes": 216,
+      "failures": 0,
+      "key_exchange": "none (plain HTTP)",
+      "post_quantum": false,
+      "requests": 11,
+      "source": "qrng"
+     },
+     "agent04": {
+      "bytes": 216,
+      "failures": 0,
+      "key_exchange": "none (plain HTTP)",
+      "post_quantum": false,
+      "requests": 11,
+      "source": "qrng"
+     },
+     "agent05": {
+      "bytes": 216,
+      "failures": 0,
+      "key_exchange": "none (plain HTTP)",
+      "post_quantum": false,
+      "requests": 11,
+      "source": "qrng"
+     },
+     "agent06": {
+      "bytes": 216,
+      "failures": 0,
+      "key_exchange": "none (plain HTTP)",
+      "post_quantum": false,
+      "requests": 11,
+      "source": "qrng"
+     },
+     "agent07": {
+      "bytes": 216,
+      "failures": 0,
+      "key_exchange": "none (plain HTTP)",
+      "post_quantum": false,
+      "requests": 11,
+      "source": "qrng"
+     },
+     "agent08": {
+      "bytes": 212,
+      "failures": 0,
+      "key_exchange": "none (plain HTTP)",
+      "post_quantum": false,
+      "requests": 10,
+      "source": "qrng"
+     }
+    },
+    "qrng_service": {
+     "available": true,
+     "bytes": 2636,
+     "clients": {
+      "127.0.0.1": 2636
+     },
+     "mock": true,
+     "refused": 0,
+     "requests": 107
+    }
+   },
+   "seconds": 0.004
+  },
+  {
+   "index": 21,
+   "do": "check.metrics",
+   "name": "D10 latency over the whole run, and APF time per request against history length",
+   "status": "pass",
+   "detail": {
+    "send_ms": {
+     "n": 47,
+     "p50": 1075.8,
+     "p95": 1151.3,
+     "max": 1177.6
+    },
+    "delivery_ms": {
+     "n": 322,
+     "p50": 1545.0,
+     "p95": 2838,
+     "max": 3045
+    },
+    "admit_ms": {
+     "n": 7,
+     "p50": 1160.8,
+     "p95": 1250.6,
+     "max": 1288.1
+    },
+    "apf_ms_by_history": [
+     {
+      "history_up_to": 48,
+      "requests": 63,
+      "p50": 36.27
+     },
+     {
+      "history_up_to": 96,
+      "requests": 48,
+      "p50": 55.47
+     },
+     {
+      "history_up_to": 144,
+      "requests": 56,
+      "p50": 46.44
+     },
+     {
+      "history_up_to": 192,
+      "requests": 48,
+      "p50": 46.05
+     },
+     {
+      "history_up_to": 240,
+      "requests": 56,
+      "p50": 53.14
+     },
+     {
+      "history_up_to": 288,
+      "requests": 56,
+      "p50": 40.85
+     },
+     {
+      "history_up_to": 336,
+      "requests": 48,
+      "p50": 53.83
+     },
+     {
+      "history_up_to": 384,
+      "requests": 56,
+      "p50": 46.39
+     },
+     {
+      "history_up_to": 432,
+      "requests": 55,
+      "p50": 52.23
+     },
+     {
+      "history_up_to": 481,
+      "requests": 55,
+      "p50": 52.3
+     }
+    ]
+   },
+   "seconds": 0.005
+  }
+ ],
+ "skipped_steps": 0,
+ "backend": "local",
+ "topology": "scale-8",
+ "entropy": {
+  "source": "qrng"
+ },
+ "stack": {
+  "agent-trust": "f21afef26cd5a87ff02e2c53faecbd50553eeb71",
+  "openmls": "93ad743ebe55d8983558ded3876729a00b8c291c",
+  "openmls_libcrux_crypto": "93ad743ebe55d8983558ded3876729a00b8c291c",
+  "openmls_qrand": "868f058f5e9939161b5925d9105f5979c0ad748c",
+  "testbed": "6c77d1b1acbd51e402eda3d77e2df1710d242160-dirty"
+ },
+ "observations": {
+  "apf_state": {
+   "branch": "5afb39d0a5322b2d27d44e54e4e299768bd7cb92396d067a12c78381f2ac6476",
+   "epoch": 8,
+   "grants": [
+    {
+     "active": true,
+     "generation": 0,
+     "right": "read",
+     "subject": "agent01"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "write",
+     "subject": "agent01"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "admin",
+     "subject": "agent01"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "admit",
+     "subject": "agent01"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "read",
+     "subject": "agent02"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "write",
+     "subject": "agent02"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "admit",
+     "subject": "agent02"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "read",
+     "subject": "agent03"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "write",
+     "subject": "agent03"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "admit",
+     "subject": "agent03"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "read",
+     "subject": "agent04"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "write",
+     "subject": "agent04"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "admit",
+     "subject": "agent04"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "read",
+     "subject": "agent05"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "write",
+     "subject": "agent05"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "admit",
+     "subject": "agent05"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "read",
+     "subject": "agent06"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "write",
+     "subject": "agent06"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "admit",
+     "subject": "agent06"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "read",
+     "subject": "agent07"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "write",
+     "subject": "agent07"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "admit",
+     "subject": "agent07"
+    },
+    {
+     "active": false,
+     "generation": 0,
+     "right": "read",
+     "subject": "agent08"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "write",
+     "subject": "agent08"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "admit",
+     "subject": "agent08"
+    }
+   ],
+   "group": "scale",
+   "policy_revision": 8,
+   "read_fenced": false,
+   "repair_pending": null,
+   "roster": [
+    "agent01",
+    "agent02",
+    "agent03",
+    "agent04",
+    "agent05",
+    "agent06",
+    "agent07"
+   ]
+  },
+  "relay_stats": {
+   "dropped": 8,
+   "duplicated": 13,
+   "expired": 0,
+   "faults": {
+    "drop": 10,
+    "duplicate": 10,
+    "reorder": true
+   },
+   "fetched": 335,
+   "handshake": {
+    "scale": 8
+   },
+   "held": [],
+   "hidden": {},
+   "key_packages": [
+    "agent02",
+    "agent03",
+    "agent04",
+    "agent05",
+    "agent06",
+    "agent07",
+    "agent08"
+   ],
+   "leased": 0,
+   "pending": 0,
+   "posted": 322,
+   "queued": {},
+   "reversed": [],
+   "tapped": 0
+  },
+  "agents": {
+   "agent01": {
+    "adversary": [],
+    "branch": "5afb39d0a5322b2d27d44e54e4e299768bd7cb92396d067a12c78381f2ac6476",
+    "confirmations": [
+     {
+      "outcome": "ok",
+      "response": {
+       "evidence": null,
+       "opened": false
+      }
+     }
+    ],
+    "cursor": 8,
+    "entropy": {
+     "bytes": 1032,
+     "failures": 0,
+     "key_exchange": "none (plain HTTP)",
+     "post_quantum": false,
+     "requests": 28,
+     "source": "qrng"
+    },
+    "epoch": 8,
+    "errors": [],
+    "future": 0,
+    "group": "scale",
+    "inbox": 41,
+    "membership": "member",
+    "name": "agent01",
+    "polls": 140,
+    "public_key": "c7820b39024ea49429957f93e9596589eee45ba49a4b5ebf3e6af3ee761082ed83837ce8bdb77d140685558a39693def863ad25959f2300d2d5dad7266bf462b5ea4ce1d54d59981629d0d2f44db18dfc53bb62b50d7902320f95fbb5ffef9352528b49b132d86223e00cf7a8cee5a340810227e1f292823faa971ffcdd0842c94654bc3459db67fa9bbc3fb34286c721b83461cf2c0a1dbeae8498c76e411af16cdc2a387ba705a8ba44f0adc9f91eda9d2430952d3b50833555efebcbdacd369c3b1c5780a91c87b71680041283a59b13305068dbf74b6f5be56c6a2cec91cd763dd6e0e5e115ee7cf368c348e244818a274f91c2b276331dbf7ab429ad28fef27f53d703f20591d5a54978122c45f98f4490396d0367f8711f79a0d03714ddd6ce46644ccaf1a395db6bbba369ce5b0bbca1fdee7da6a1afb67d13a657c2a4bc6e3c960a77b9615c3694705dade0724f226eb8923787b0d5271c2579bb21e77143d5198c2ec103aeb7d0f52c2798accf54aaacaf9f9a24809c62b74ba2fa216b9a4c8d856ea1ce0fb16fe542a2ddd310cc2d46ca3b9c539104869128a0d3aeccbf3731b3381ce1126898f2eebffe4f2331e7b058a98bec0e8bf6f8c02edfb3928729dd77f99568b5ea68128f8603130e90424b3c6169046d3d3a868e65756e6da43dd043ac25d715680cde33ca9444d0d0d03cc9d395b265a46db3c8be5211a5ef08a53d3b4c5dc4663b6849fbc022f77fd425d0b80f4f68fc860119f7a238798f5f2cdcea16676d4c709ff4c9570b57be130af364cac2f3ba3719ac97c60193dd2fa9a4fbab9f838c501745a468b4af85d96fe435cda6e920fbf7894872ba5a86598de9a74f65df9695d6d3d7a3527be06134a4b7513f2d54bb2ef49dc92b02713d2186be35126ffa1834ae3c7a00287c10b448cebb13a05b87886671e9ba5a5ae0f72857f5d3807139b480cad1edd8f2cec058df1712799cbce36bce08a64f5560a02900a44934b76ffc4db09e22ca3b80988035e8af5e59fae76e6b1cdd19c3a547ba56059236d52fb6bc4d469a1a2884c29cdf7092bd5ef7a1d03371c17a9d5e2f6855b249436c15694e9217d503c6b7e88356002b57a171a21f066397eb61616d0b459c94b011791c969c6199780e20404baa9c7185352941db101d44d366d4e5553d27782ba938382d2f482ba48cf3fd2be705c61eb85c58612b22d98f754dced07cfb11bf2274aae5073dee6c765e8ad1a2e0086ada9defde8a3f1ae7f7c57a0dd7883e5bbe728d8dfb7cd42d0df480ff06316f2f6660c496c5dfa75057c6c1b683f0ff1639acebcb34c5322ed9577f03956d1dfe5a27998570af6ea529bf06dac835ecbe3e6d01a32861e4716e3fc765962ed0c3052ef5e15f10ca5f7d6cbe8e5d79963c2b5f4e1c1489b5f299ce02938484d1c0b089219d7593cae6c0a57267553b6f41a29c391261dc91901b09887c6f042ab6e28dcf3a41811bd9b9cd49e068ddc108eea7e73c6335891103de5be07dd8723e114f2c8f69ecfeab56fd6a36b4650d700c38759b1a58e39a69e84f46f5f7b845c7aa00e60d16dd386387a42cc2f5f6d4dd2553d2e328db26deeba17c3ecc488b80e9ee10b8a1a0edf917831c1c8ac4196fb5bdbdd2f0f18ace238715d2c9f4ac60460ab1260c1e24708245175fff54812e5e1f1394e6e7dec0839c5bb67e28c5039f36fd6d353875f82af85e1a5fe824396aac77c6e1472348f458032e1ce5b107202a6db86903cb65848b47dafb98092bc27ebdd750dd0d6e430c04352a8adae7552e30c49153732d7d5a03983dc8adc7491f4e2a525b56ef97f26b81afb76acaec025a400b6",
+    "rejections": [
+     {
+      "code": "undecryptable",
+      "error": "undecryptable: MLS processing",
+      "from": "agent03",
+      "op": "agent03-000005"
+     }
+    ],
+    "restarts": 0,
+    "retain": false,
+    "sequence": 83,
+    "skipped_entries": 0,
+    "suite": "pq",
+    "waiting": []
+   },
+   "agent02": {
+    "adversary": [],
+    "branch": "5afb39d0a5322b2d27d44e54e4e299768bd7cb92396d067a12c78381f2ac6476",
+    "confirmations": [
+     {
+      "outcome": "invalid_repair"
+     }
+    ],
+    "cursor": 8,
+    "entropy": {
+     "bytes": 216,
+     "failures": 0,
+     "key_exchange": "none (plain HTTP)",
+     "post_quantum": false,
+     "requests": 11,
+     "source": "qrng"
+    },
+    "epoch": 8,
+    "errors": [],
+    "future": 0,
+    "group": "scale",
+    "inbox": 41,
+    "membership": "member",
+    "name": "agent02",
+    "polls": 119,
+    "public_key": "23a8f4b4e90faee15e91616388c0be22bb34014714717352d4361952978035e47bea4e8424dff776226aaee057cf4e03bb0fd53c37326e46b619adbdbb420466d105d77c9bbe912bac3d3d7294a4658c0025c4b3ea02f0c1f372413ab559202bf223e7f47555f355728da5315765613c65a6fc815cca6c7160c16252d52997bb326d84c800abc0ad8dd5c7ad9c7557b2dab15ae6e34ec9806025383e23c95a31da31bc40513d454e6fad9c916b9f165194537dd8f83477af221d86cbd70ce2b0ea53225c379391867d15c764129d3f925b0986c59b43fb081ea8219093fd76465b8dab9a5d2bc8c33edaefa27a6d95bb67fed3531a80ccdad8e210251bfbde8b25a70925d3a2582814ab0a948a4e410ede93868b6eebc26f03b85b9138c9a9808d0eace63feea6b78f13218d824c1f4b78b03c5b29307b449fd0b9f23f4203e30a62f0354936bb3644e84c55fe54042653e63e3911ffd9c21aa7aa28b6a52bb325728a9c0e57e10d797a8ea87e9c45c6d9e15f51626a120894022598efefa41c817eb85aba50581ee5a381250a1bd9d4d09043b8340424a1379f13b3b11c431e73c212cda0ec4b9ee74cdc4a6f0844814b156616c05d8643d0075316b3056549795d63c87c97bcba10b2bb66901985e0a21d6f90001915243bcd62cef8b3ea619001747ebb8eebb73059d4a1e337cbc0ab530ab7adb4eaa083a25176891af8ba2aa2e6aa25e7ac81c8ad390e22c89830f996382c9bb73d01c3565686e936fa486272554b6a3627c8d1b0e49ec4e64c14eb0e50bdc48780fbc6e29386e15e796112ea0c2c22c63cb629bd016313dd536c9378fd582435a9fcbc8f21aba9162565a6ceff98aabbabfa9f7681af8a78b2dfdae1fb72310684f87e90779cd71becf55944f14f42168c9c4c9c747928b9da424f13eda55ba078f9d56e20e6f685793e2e272658c5ef924bdfe100adf701cbdcb6445379c04a2daf3d32d4be73cb20844fb43f85e1172f7e4dccd50bb9bb004de5bf608ebd813558419d15799763c3305730fb6239f5a749d87b6b562e2aaa46ca3d975adb252ce0d7985ef5de7d1d855d8310d4ba441db30eebbdc80493f4ed7719d0af7440ff51672cc3f34544101ca74bf6eba34f12e6bd72f00588627be50866bac4a4e743dd9736b493eaee7e723f8ca98f3d39cf3bc332254ed13a8fa25110b9bcd828a0bdd106dc86d3cdd855a466498df56b0b9fee0dbbb2895287e3ce7c0157958d41761db269429a249eb3eb0f533f7dcc710f65bff04ec5947280e88efb93e1956d936d3cb724c2d14bac251e14b335c86f5c2af80bf8a5ceddf94523559687aed180edcb25a36e28bd40e4869d2c8268b3c9cd609687b5ef898578e00ddd3eb640b88e3b7d5fe78fafaa3ee0874f79633d9c0b01cfd9f08907250308835023379acb39e49597d1a04bb345da54dc4647511905dc30b1317b3451fe794b8d9691ae571dfccc9e20607b8900f9ba2cf602cfb3b20230512dd14511895d68e0f4288bd62ee889aec60c9397d78bda1baf644474e1dfa108818a90781aca2b6976a3321f2c2b6059c544b8f9c7b8bdfb63ea06efa329fdd9c70c05f0d7ed83e27735c86b0efffe81ffa75034f4cf07d036a1decd92e523d4c0ba4081612d192d2777b16e2e169fcaeede1189f419181129da4e0935291d22fbc8515294fcf139060006b850411bb07002ed46ff231bd2d99dc18fba86b2e03ca0d25f2ed4239172924682b569aca2d303b6d9857e49c6fb9a43c8cee840a5c1a479d443c58d95d338bc7cc657ac81077d944be8766c63dac1f6588f2754c567a5f55b656e2ea57351cafba2346749fe66d566",
+    "rejections": [
+     {
+      "code": "undecryptable",
+      "error": "undecryptable: MLS processing",
+      "from": "agent03",
+      "op": "agent03-000005"
+     },
+     {
+      "code": "undecryptable",
+      "error": "undecryptable: MLS processing",
+      "from": "agent05",
+      "op": "agent05-000005"
+     },
+     {
+      "code": "undecryptable",
+      "error": "undecryptable: MLS processing",
+      "from": "agent07",
+      "op": "agent07-000005"
+     }
+    ],
+    "restarts": 0,
+    "retain": false,
+    "sequence": 67,
+    "skipped_entries": 0,
+    "suite": "pq",
+    "waiting": []
+   },
+   "agent03": {
+    "adversary": [],
+    "branch": "5afb39d0a5322b2d27d44e54e4e299768bd7cb92396d067a12c78381f2ac6476",
+    "confirmations": [
+     {
+      "outcome": "ok",
+      "response": {
+       "evidence": "pair",
+       "opened": true
+      }
+     }
+    ],
+    "cursor": 8,
+    "entropy": {
+     "bytes": 216,
+     "failures": 0,
+     "key_exchange": "none (plain HTTP)",
+     "post_quantum": false,
+     "requests": 11,
+     "source": "qrng"
+    },
+    "epoch": 8,
+    "errors": [],
+    "future": 0,
+    "group": "scale",
+    "inbox": 41,
+    "membership": "member",
+    "name": "agent03",
+    "polls": 121,
+    "public_key": "c40fe63432a51195f18e74b4efd9ab0e840f3728227e755bc4a032b291c3b6aea997870b1c27df04f66b0c32ce71926c7ae041da741c7ff0bc3e3726ef448ec8985bfd186fac5308fbc18d8a88e39d9988ec5ae05408ab6df336525c5f9b504ea4e8a15c8325983a4c261af8f8564ee3cad5ab6af78bb0455c9055abb8ac98ba3af5021ab8ed62e7b035159e3ee2a02cac2afeb8f1665992ca4452880a96ad84e30a039fcf1577ec4d82009338b11590eb956cf7a7f2245f6f46ca2c92c1690627c808602f308b9269bd21720c4bec90b3f5ada9fecdc93367086a48a7064bad802419f33b5dd6841ce56e12102d50558d1c6577e833cd1f54a0c1f845cb563007727f46761b9d8d65515c7308e828bbb1a1157ac6eb3bc565302924406f033ffa9be3b43b62fa1aa8199eaffd594f42db004e40a04949a3e36d5bdd3eb58312a4d3991467d4b4b51d7eeacd562e07beee3b3df39cb9aeceebf3b10e39921e0ae6230e56a5c4151c82a1ebc8a4fcbdc8c1c24b6ac5a0678bc51d1aaea1b8d49548f09718756e668959e47cc06a4b8676dafc5f58d018f0d4930e2975784b3005d737c483c2cbf4f5a39a0f7bfc1a26dc5fb47635d80ea018980a1287ff2dc516e21ac523cd51c5d3ee50b1cbcf727b8feafb1bcd49efa066c024028b34c21497ab986240c42bd00bd113c178c9c12d7c558a732482cbc2f2a7643993e7a3834091a2a48d6ebe8f647bf9e485bbb5a3efda6731c8c40d391e23c2d8b6f913e46da251bef9e97880413e3089d65362dc1ce9e5a345926adfa279c8959dc90da7b35624c622c95dad5b97433726f19400586d8e8ad56014024f4dc8f512972d961dc53cbb52eb364d512cf82136b1f574f9c140ddc316d99ed93a665abd8ad48057ef26fead3930ad9a1df4cd98471a5ef9b4ff55680181ccd5a061f0860787c85aa1fcf8c2ec63e130b9b3ca14b724b359569fa326f89385816d2d55c02d4518b3771cca4b69d00f35b0d0aa62727b6f93c4a982108dea809685990520f13baa181fdb6a8ecc321fed6f39ef7b122972c7835978a200775a8a25c08032ca6222764e6c378216b2ed94a0ab895623fba0e8dd64376db5555e8da498741c2bbc37f984656f2e75316c6925a12ebac1af111ac0c69415d23e03f6218b634521aa212423461cc12cd282a2446959508e467de795c523d83657185f0278fa41ab459d492440e1aacce21c1207d038b1f48dfdf9b3ffa6f361a92c99b41311700e5f935ea99740fb6af94bb7be6bd61a1578947cabc42088da8a366bb343d085a336f8bedb6cfe9ec61729eaa37e64bf064f8facdf93263d1e7fd502ef254971ac9eff7550b6c7c7ce3bfe382d99b0d7d0433b3b73f72d44ee77289e53339c94cbd0ba7e28cd3bc4fcbda34242105f2687eb92c925d1b4021b42a2e8622e96fb03a5629a9fc5ae5878f99fd1228e4ee1387419d0b6d7e44e00a6ae3c9c3b9060b83177522a480f3d3066ebadb242d65c9bf34946957435379ed8780e3bbb57bf4fcc479c046f8abc28da8dfdbfb2b145a33804cc0fedc734747fe0eb6d0ee3bb522c6796b0a055a06629985f2164778d7f4e48f973481ccc41b216330432883b21eccecf9945f1b5a0174a643493eb8e65027c449059147f419d1f97d23acf86cf3eba777d964ddc1f2968458055b7fb963a1c73103a83684243a437e20eec362ab6075f3b3f22f3a23fd7464f85750d77282b04c13900ee4f7b064c400f09db8a23d49e007ae947b58497b11c7f0cd6b07e8ad2a6df1fc434f37bd516d98cdf1c0cae5245050147ebfba18e80963abe158202489350df10cb0a4a4eb004acc87f578e0a",
+    "rejections": [
+     {
+      "code": "undecryptable",
+      "error": "undecryptable: MLS processing",
+      "from": "agent07",
+      "op": "agent07-000005"
+     },
+     {
+      "code": "undecryptable",
+      "error": "undecryptable: MLS processing",
+      "from": "agent06",
+      "op": "agent06-000006"
+     }
+    ],
+    "restarts": 0,
+    "retain": false,
+    "sequence": 67,
+    "skipped_entries": 1,
+    "suite": "pq",
+    "waiting": []
+   },
+   "agent04": {
+    "adversary": [],
+    "branch": "5afb39d0a5322b2d27d44e54e4e299768bd7cb92396d067a12c78381f2ac6476",
+    "confirmations": [
+     {
+      "outcome": "invalid_repair"
+     }
+    ],
+    "cursor": 8,
+    "entropy": {
+     "bytes": 216,
+     "failures": 0,
+     "key_exchange": "none (plain HTTP)",
+     "post_quantum": false,
+     "requests": 11,
+     "source": "qrng"
+    },
+    "epoch": 8,
+    "errors": [],
+    "future": 0,
+    "group": "scale",
+    "inbox": 41,
+    "membership": "member",
+    "name": "agent04",
+    "polls": 130,
+    "public_key": "22f3f46fda95e0b29b983d9ecbed7e92cc6e8bd71ea8d92ce6368c0f547e12cc4a0ccb77d3065227bfac2e7bfd057b552aff17e566e7da27a30ce7da2d998990ea1a03d00fa0fe94877c8cfb7caf91e2d659e6926747c0434dedeb5ac735f965d41f4ed68f9b3a6278db6adffd9abf60ff7818699dfb200a99d4aec4791ec2a43c51b1d0e479399fc5eb026f0a8da843b01994bc2b480b1ca4099763231fcd50ab8e5858b219cb51fb242ef7621eda73d346b1cb64bc9286348266e0ebbc358760355920a76050b4b3294e6579d31a9babb11f70e8f5d89b83f46f0747703ac6cd17b19aa8eafa71b1d79f4b0b2194d38d3920c830cbede0a934b54b135922281331acdd5a398e7c2b3e42d542cce5b753e6938701fccdbf8c5d0d2ce14ed31210110df8e09012e7a59aebb2176b2212bd8da02792f9d9b748c5d05f7ffa38319f418a94c3e46fa934aa24417495cc56d9081e13a55766ff32394a6911b08eeb09e638efbad8e8ddfd8234cdd8401df260008cd4a07fb5cafb91a6dbfe0a4ad494204d3d5cbc85307263b57338111cba7e616a6d2de6b436821e0ee3383bd6c05bb89987e9c3b63edba96faaa247fcc897f0c264ab2e11670d7fbc9fa08c3d2e12cd3dd82eda0b5c34a3f210d600a56e9079f1035f749833393c62c89c891d6f388aac5305450d9672f408de0fcf52fd2c80cd2f0bc6e1f01946cf994b95a1230f477af0312a11a8f590c0780f51e9b8bc2a8015e5ba5ef126abaa97656fe218d8c41029650511cd262dc90840d3a9d1ee16b43e38cc8a426a09d02da5c0e83ccbcf806b77b6a7e476611fb427ccbc273e197bdc8f1e0b45c3b37251a8caa5fb14371eb986dc4590766db5d1ccf4b4f51a8af4b751f31298d33aba893964eb64b2665e702c0ada0ae2a536c79d9452cf34441503d8b2838899163662961a357a514827c62e37dba2baf99591f17c2043a8c9889af365549e7ddce09920d350f08336aaaaa236ab56dfb0d45db71eb245e5b6cb31ad230e9294adb1ec118b377e175d155082f3faba2f8f2c58354525113c59f0465f2487e422902241bb931d8833f7a471f4869adb7a543d9f1005b1dd1b677ad3c95b2b610d863c50fc4f11f5476a5f7158cd12b0440a551a7a36573f87619d86bcdd77e26a051e46da31a7062cd5f8b5dbb981dd5e398e7dc0f8ed296147e95509e120b3bf2cbe7cd7e7506ffa0f6e52288d16fd8fe0d44475db08889bb49ffa6a1219727219f75ba5a3efd3849e68e8e1d482f8874a707128c1242b40829dccbee58ffe66ccc9cf6271306397f454614e8a93f014c0d8b48f22df11237b812e999454c5ce9dbc782c92af823ce64345b2ba8932dfe157ef8f8444d78763bd6d3bc33c4ecee7682a3b152e4ae44fcef95ca48b557f5a44ff993fd6a8364cd2fab93d27491ae4bed4902e1de71d17cdfa16811c5e900f2975690139567b9a89c4a36846577db72269efab99adee41b1dbc1f4dec81872dc785d25f5e5ec6bfa15b6df6d251bd3fc87ba5acffe81b40d2c99387ad5e3883168370911ecd3e11e305b33b484b52fc0f45a75f05f39294c14b4075fd260b8cce44e676bf5c96de9648da34694435061c68bc1badca90c3682efd5014f778dc1ac81a0e3c7ffca47fee6c77f6ce9ece6bb0badffbf855fa4bb432ec1f5a6c65b0e6a95456f00ce48a93b771ebe8e0b44157d41663e36e436184cc2864df691ce31acec08020b406fdfec4e0513ccdc79d99dd2a421023bc0431d46ca40dcb362c7f4add75dda7a9d98ab409d542fb767edaab7f97c94c55cc3d932e1388b44851812a889272fbfa3902030d0de0358aff0654cc16d",
+    "rejections": [
+     {
+      "code": "undecryptable",
+      "error": "undecryptable: MLS processing",
+      "from": "agent01",
+      "op": "agent01-000005"
+     },
+     {
+      "code": "undecryptable",
+      "error": "undecryptable: MLS processing",
+      "from": "agent06",
+      "op": "agent06-000006"
+     }
+    ],
+    "restarts": 0,
+    "retain": false,
+    "sequence": 67,
+    "skipped_entries": 2,
+    "suite": "pq",
+    "waiting": []
+   },
+   "agent05": {
+    "adversary": [],
+    "branch": "5afb39d0a5322b2d27d44e54e4e299768bd7cb92396d067a12c78381f2ac6476",
+    "confirmations": [
+     {
+      "outcome": "invalid_repair"
+     }
+    ],
+    "cursor": 8,
+    "entropy": {
+     "bytes": 216,
+     "failures": 0,
+     "key_exchange": "none (plain HTTP)",
+     "post_quantum": false,
+     "requests": 11,
+     "source": "qrng"
+    },
+    "epoch": 8,
+    "errors": [],
+    "future": 0,
+    "group": "scale",
+    "inbox": 41,
+    "membership": "member",
+    "name": "agent05",
+    "polls": 136,
+    "public_key": "34719e579a8b9a6287f6483f07981d25cc2f206c3a6a41f780ac9bcda0ac657a03eb072af22179f5a62642f11c8fd48faff033bcd573138ea1aa04b19f9bf28fb24d944eff2486c6dfdc5916cf2fbca0e2d163cd94349772234cc64a48ec1f93846e750e18a5523a9e6977d6cc22bdc4dd33a5b73a7fd8f7404db7aca23eaf28dca0a430ffa0d28fba921c1178d0451ee816b631e2bfb2a1f6240dd77925c5dc5e492be85713081997e94795c4b3362c7c6c0b85e121df932d252af886a09cdbb6e7a83135a23c201a70d473ae6b5ec3143e99895466cbcd7322afb5e3bee231ff5770a6f2879450be384c0a59301f6df3734321840a66e948f2e7d0ad40a9495e5f6157daed9c4cf0c24ec91d3f0aecf550a790e021bc6a121970c93520d9a14184634c18c6adee53721d4728b29ccfdcc7197fa6cb066a016955e1c316a269c4fda0146451e7dc62cdc669c0c4b651009eabe2ca702325050c0303cade8835f9acf6e36c774f0daeded9cef4bfb06167efd5af2fc50d57a50f1cc7840a589608305e939b42ecbafe275cdcaaa4bcbb5260a5e1cea55bbe55323eab4004d682cb7e6e5b7dbd5f310b7d85d84ee947443f7d1ecb3c5c5ed74d4f5a53a9ed5950cc3452d8f8d0daaa6488971fbe188b5f61d3bded2524609187405acb707a919ff6250ec638128b93bfe75c11f3c0cfdb384e44336ffb08b68da5fee2a5aebd9cb46fd9498a76ed9c99321923f3156753f104f9ee8339e4320f3c153b675d8a2ae76baf45ca7c0b37e10ecc56bd31a8430002f991781e5352e913bee76dd278243b6eb57f90f8054710617619c9c5400674750962c4228cb90c4c0669fa51b25135537ccbfbfe5c75bb93a616d7e6fc0031c5188e8b9b368d1e8305c37279ccfdc324e6b22bbb839b29693b565a39b6605a4eb50990d3b3c0770f221f2e62fd641a306f8b8094c550985161b9e9f71f49b1678eac359dad55257b3873e22c36504ea5a24bdaa620ba0a171105fbfe2b0b385804a5d4ab3b1c560b522b28a37f8a157558811d66efab4af51d89d34bc535ec234215749d90e0763b69b15abe6dd09c5c422c2fee8ccfe2b0ec2d40ef5a6018c51571203febaf2c9ae4c0891630425aeca31bf734117fa701b938333c368a6542ec3e715cd7424ad38fdfd7cd585107ed1bea537a4dd8297d9ce711831f9cef7d11ee5d3614d65cdfb3a6a57673cf90f581178041f9a405826a672df7eab7a3f783a469baca3777a32d5d9296eebaa073cf8de1b17f10ad8445caa8eeaa2d3c0abae779c0ed1390b396b6e7fce197316913f3594650af35085eb15ef6f3f2f508293253ffa0be987f4676d06f7f318f3cee64984b818e9ab606ba9654c7a0b62b8dc3a2cad423c92e47b55af66ab534cdde32d6f70367978134c3c4d7418514bd75f0bf80c3f9a5faa35888a49aa9b85405dce077536c71cdefbd6e4702217737df2a72a7a6666c71d969b6cdf283007f200e67a50c7dfab0f850e68f984e55c829b2a9abef29ef251efc2bdd85f072ac9289be28cbdca8dbf9f1db8f8f45c46da47fa6552c521984552c866ad6a089f158f5b5e2639a9baf5b95336c5877fcbcc734a4f357ef269bac644f2e61f0a9d542c0c3e0cfff267c64eea9749a261d976310211deb6f58a38e05c2996c57a6c202253c6514cd815fd0805a998e6298504072e64fca98a70e6bda45712339d93336c4bfbb862dedf055e4df840d0d9bbcfc88fab2fd867d80bd14c3b73e0b7ec210194832539c3992eafc214c381f7a46e36465ca0e8e8652f3d784e77af2a944d09146d804e37642dea610afe48c5b62a7c041a1ea67a3784ac33081071b",
+    "rejections": [
+     {
+      "code": "undecryptable",
+      "error": "undecryptable: MLS processing",
+      "from": "agent03",
+      "op": "agent03-000005"
+     }
+    ],
+    "restarts": 0,
+    "retain": false,
+    "sequence": 67,
+    "skipped_entries": 3,
+    "suite": "pq",
+    "waiting": []
+   },
+   "agent06": {
+    "adversary": [],
+    "branch": "5afb39d0a5322b2d27d44e54e4e299768bd7cb92396d067a12c78381f2ac6476",
+    "confirmations": [
+     {
+      "outcome": "invalid_repair"
+     }
+    ],
+    "cursor": 8,
+    "entropy": {
+     "bytes": 216,
+     "failures": 0,
+     "key_exchange": "none (plain HTTP)",
+     "post_quantum": false,
+     "requests": 11,
+     "source": "qrng"
+    },
+    "epoch": 8,
+    "errors": [],
+    "future": 0,
+    "group": "scale",
+    "inbox": 41,
+    "membership": "member",
+    "name": "agent06",
+    "polls": 141,
+    "public_key": "8a89f550a6d9bd2588b8d0762ffc871741f49d398b39049528fbaa8ca5fd33a722f99cd54ec9d882b1d1ae8080fc00c23b95d502deeb9825d9d7baf5036c0e97969368f65335ade7abd42933a9eb48375bc2b828eeb1f303d2500602065c9d644a1d20517e4a89e93c095dfb304a407abab06d212d7b0d9f62b7bd2dc9ff2827441696ddf5de41f1151509bf6a1f08ee653024513421419081c81bdba310a5153b5d07a7d3d51bd68638447b638b6bf79e802048da19227580b12012bc94f5a01cadae41f67d2846a9db7e2f7b8a0aadec841e09bb67bcf64d050ffe2b1a3498815ae123cf298d520598f825d660a37f1a8003fed1a4c17f11fcf4c741817ec0c310595a22de3104eab47cbab6490956fa91eff454b79295fe5ccfd0fa944146c021a134858110526022ceb4b2db5572c3244a81e7e84fec1d65b68d49843675407e2ad4178d8743fa60508c78876635a0b12321c5a2ab0839373c632ef4cc9aff762fff472cd93b9e10b15848864359df857e8859e0d3a39d8f53aed5e83155d4ff580f00ab50a02e26bf2dd95b70e2f7034d37e19e05d00176ebebc22323ff2a6105b3b51897fda4de35c844b181c704f45a146f09f90051a04e2465af10d13957f22730846edd8acb3b40f963495aa01b121eec7bb80bc248f212468154baf6f7b463b113355ebffa356c22962c9d93c0b6a32a20ecc2fa61b2bddb4e0652ebffeabe05147f92119821782ee53be816d6395141536eb1adeaa4bc8a870594406d98368955fc20bf146da06495057743695ae41acc842c8df8a6f92e64ca8500ee16686c34f52046bfd2082304e3bd5ddacb4da5ee330c788c85a628739aa9a12e3b6b226d355fbe526e882d1eae665955a98f66960b871c659d6e39a7484dadeb392af5c2a05ae8899cfb68dddc97e258c28a50bc5090df903ee178b16644655acb64670806bc83d4433ec6b748b96f71889cad663476432a79a3c2ad5c6eab306cb527d4ff6e66058e8301b696df63b26bfcd7d5364739ef66de4db10881f45b76c584c6ae4b56be2034b246198ad8804bb188c8a9e625d791f4fbbcc10ed5c990dc253598b9d0f43b841c9a256abfc476aa4ce40ab60b26ef710192ea0957cc74176de8a4bb55b7ff00a575ec05d41ebb0313a4953cec0aefc6ef3ccbd8499004becf476384293efb4e20b7c4fd5fad8e63d5aadbdf4500dd327be8e5e8caf6c94997928bbc43585f7860e9a6d1e345aa5eb041937900698e771b1e291ff0038a261104695f2e401c585fff2f58eefbe8b52620d6efce6fd0ef0861904e5fa3d63eb91d7e7e5d2f8d770ae351c296f2ef72bbaa797d8d894b4335eb580ed566159de6246c0fd516ab7135461130f8401e05ccd21c63066652faa90219595b834b7be186b2ccec642b868a5b9e72e529ae76900859c49b62782ddc43a6084ac405c2e7cd403aa500d12ee0fefb2bc0afaa618e3f3d6f7f160dd6046e01604f7dca32ef968f8c31ac02810d7d4a4ce616ae930874cdb0773437776f484fdd01cff756114026861e25e73a822742f95784c4929ccfb098a9cbb91f44b12ab801373e0505a74dab05298cf7dcc4209cdb3042e1566329e2300d7307d6cc47b714195f61260ce5273defcedd7b54dbc73fdc1f7b90905f23c05c413f8758051eeb643386a1b4f68d181ccb7c00cd8348f42785dec55b9c104e4c696699628317ed7689b8a2a6490ceb3ad7b4cc3e7eaf68c3df7efc679345efb757144c254b152f34e303dd6d34ece9b8c223159fd3431278663cbb765629d0cd32fb47fcdbf568613c5b21edef55c721a784a88a09032699c7b56a561c9b7f817c3b45dc621a",
+    "rejections": [
+     {
+      "code": "undecryptable",
+      "error": "undecryptable: MLS processing",
+      "from": "agent01",
+      "op": "agent01-000006"
+     },
+     {
+      "code": "undecryptable",
+      "error": "undecryptable: MLS processing",
+      "from": "agent07",
+      "op": "agent07-000006"
+     }
+    ],
+    "restarts": 0,
+    "retain": false,
+    "sequence": 67,
+    "skipped_entries": 4,
+    "suite": "pq",
+    "waiting": []
+   },
+   "agent07": {
+    "adversary": [],
+    "branch": "5afb39d0a5322b2d27d44e54e4e299768bd7cb92396d067a12c78381f2ac6476",
+    "confirmations": [
+     {
+      "outcome": "invalid_repair"
+     }
+    ],
+    "cursor": 8,
+    "entropy": {
+     "bytes": 216,
+     "failures": 0,
+     "key_exchange": "none (plain HTTP)",
+     "post_quantum": false,
+     "requests": 11,
+     "source": "qrng"
+    },
+    "epoch": 8,
+    "errors": [],
+    "future": 0,
+    "group": "scale",
+    "inbox": 41,
+    "membership": "member",
+    "name": "agent07",
+    "polls": 148,
+    "public_key": "7199af2f532adea74edead3d060cba84e9a83918e321e7296ed16d772a8fa10f7aa295614926679886f942f131efae4d31de983108896130c9af8db5a7dfb546a3a2b602a939dc942c5a625686abd7ece47021ed2a0af3342a15da00c35e1f78593496e7c7c27306bb01ed62d89ab4d03eb7d724b661ccf6d6310fbef6d47fc389b2639e05b36cc1f5547db624f469d9dff87a6e8109229377c1dc37c3bc4ab0c3ebe3bf88c0d0a227a9e1a2d2691aed8b38cd3d2b8c607da6d8fbb5a752e0fb40bed47ff794bf63f695810677b2a7fc6c72c29b3dac471dde96e2b479e95b9b9efc9d490888eab35ee1bdb0dec61fb4f562fd662cc545a6521a0aea0eab792927798126349ce52a6e709737d05a9910ba143d065abd063ce08126fbad0aa9265338de769072fff2259fce6f8940c61f9d6c295ff33920a37ea340227c3cd10a93cfa4b1d0a60599395fda158bca8bb434def9136c3f1c6ead197a6b9e7a9395adee2c4d59e94ffd7908e168fa8e44fdc21290e3eea3d7a5e671452951b2394d1ee00abc7cfbaf74a4dfa2d8775e2457877e1878f9b7c6621a073bc3ec60ee7551dfbccb3bdcf14441e757bf2f05d5edcea07f35aa4ce3d8aa8581496cad5f5e07efbcdef56eaf55a6570c816f7fa804d6c60d3da1e078fa578d22f1c3813ea13c545cf22a7f1c6ba0f4564d86d64de3f49e485171a10abd4d530780145249e77d05d12219660f35bce66c7af7d6110b1464903a0488c2ee7dd0dab6d745e47492f79f43541c0f69f8a2a130be7528b75cfc0113e7f3df61a0d9fb798afd8b66f371264380b46c861aca89ca5f49aa78d9cf329524a06ace631e7ff99a4303932a6c916a5fcd4589c766df8eee56145b87d5182cc1098100629deb1eddbdc55aa5adef5331c653a46b78ec777504cdcda6c62f66c1ef904e23c8b1e532cb335a3f66590407bf835e77d2ab409811904e5a4f36ff168ffe6bd31924cc04267f1ae834fe481ffe27b92855807efe79328fa1c145d33b302a59a918ff9433eed725ed553ab4e9cb4e9d76a8088e8f6a418c9525c26b058bab2a02d43ebfc2a22ace313cf6c7640f82c1e524b1e0bc6074793370dd557b5836a9b68ecca54800a0d2ca8bb7eec99352323be3403578d8fb44f49e50f215e2f7f099c48eba325282df908f05c52a9b03eb9564d50040b12726d7a3e253df6b5ce693b551abb7100d3a5f3a4e9c1f510c19fac61660ef19487345582a711add4f0422c16318bd7deba26a952f3e21c7f12ecb5a82699bbe7ec77fd6f26150abb50b8d69fcf29a7d5b56eef2bef806b934bf1d75a4f35a08fd2d619f685a6acd389108f1ac7fe67418a5c51f20a0245c7d284ea653de6fb85db8f3a3a642c710ae24a34dc2cdcb702d6fc75d5f2c7a5899184a4b2b29bfb1e084e699a8ee48ec3bb7694610310aa1cee97448bb75fc28fe963dba483f8cb64d23fa711bf67db6025cba6d466d8fe34373087fb5a1e3f47733e2d46b000f6a2d7c45d05a3c412e6d1e873d94c398e3f3fd5cac8e771c809173e203cd86af2804f4bac718974872507e49ba4aba5e207f1a311e37451f199e5cf968965cc60709afb67a38790eff4bde6739fb54561418c8414c16d5da491b9e8a12774853b1dfc3b26560beb2b8f7ac5a2cad0a08d673a556ae0ccca932793cfe6da0e543f12dfe509241044d5e3b571f44a797e6e6ff2973b0de96932da0ce2916a9a9d6334b32e5e2c6c7d5ab304739dc8cf72850244f2eb8086bb7aed1f0325fce3e89e1cad69dc464b30a8007fa33bb778f0e6e354dd9acaa5293cb26e9ec62093a1a11252c3024e1f1cfa57f3f14aec60f11727cf4",
+    "rejections": [
+     {
+      "code": "undecryptable",
+      "error": "undecryptable: MLS processing",
+      "from": "agent02",
+      "op": "agent02-000005"
+     }
+    ],
+    "restarts": 0,
+    "retain": false,
+    "sequence": 67,
+    "skipped_entries": 5,
+    "suite": "pq",
+    "waiting": []
+   },
+   "agent08": {
+    "adversary": [],
+    "branch": null,
+    "confirmations": [],
+    "cursor": 8,
+    "entropy": {
+     "bytes": 212,
+     "failures": 0,
+     "key_exchange": "none (plain HTTP)",
+     "post_quantum": false,
+     "requests": 10,
+     "source": "qrng"
+    },
+    "epoch": null,
+    "errors": [],
+    "future": 0,
+    "group": "scale",
+    "inbox": 35,
+    "membership": "removed",
+    "name": "agent08",
+    "polls": 181,
+    "public_key": "0c488287ab2c85d92bc51ab293bbe60c40e8324e1c6571fa2379f330e4e0896e42b01e5d482a385e7de9400435c92d817792eed031ac1533fc9ccee245fb2328602ec193084b626d054574cfa02684b1e2d60d7d2905b4a6bb2a936fe51f8457b740524d80d87be7fdacb3631268dfa1a1ebfa1aec00e6f972e264acb0876ba1927c5e838b00eaac2131c46496acd110c3fa87cafa4562a598e32843a81d364bc6957791a3cae308cdf330392f12486483575d947b04d22b882f78459b661fbb1b469796e0ab268373f7a358ddcae7a6d133f887c0404a016cf6565f1a862283259efeb210f511fd5579178014124950f9c3faba27d97707421023afb95554a5497bcffc4feb46bcec7f4965af1c090a01162a9e74c862ed9dc897a9239dd2243cdfcaaae1049158e0274a8a5baafde86d7e85e7fa6e7613ca8cf32e80dff07aa0b86bb625612d65d240f3bc3805ba6f450aa108395ec186a851818bc420ffe161d3872059a74431f289ac4b431ad4a330717d46e7fc72f61c87448b837b8bb945800e3d64809c2143dad3cbe0cdc17cdb1718e8adce1a970a685af47cbe641a3b133d10aff26703dd901a048b6f58ff123c75c013561a666a12b25cbac910af18726bb993e92e5f16473906608d63834142311d9d490d835fa60a83f22b506af6b7da4c8a504a2a946db78a721b3c1d0b6ccf282f031b435de6412f9a426325034b607f22863a55610ee2bdc9761068101aaa2858b505baa6bfc8fa3d734e2be9987610361f0a60c479c8695226dbcb123da57a044e9a4745465bc40a83b8fd8dce9c16345e136a15e665788adec43b39f81dcd890b43f7c24e63d9ed171ba265f334f83ac5885114ea1fdd48b8677be33fcadf340cef5adc18a473861b77103445ddb750d8675e725684a3d9735475d6a53d83f53ab0097d3b41eea590957e100d872d4874364ba354d7b2f5147d1e858b91d586a9d3b838b0c994433a4ebdf2525f7579459894915648af6c104f00a14f94ece56c1e35f7051abd98adffe2e1faf768ae5200c25fc798422a7924842d904526f42689d5e48b4d29109a7d4908a56dbd02bcc813381c82b39282fb668e00bb00a6addad2042e35ce37da7178825930d333776cfc1f59d34693a8b841a48dbe7d3f7b870b1b3deb4fccc092daa9430d6ec377d25067efbcfcff41cabdf0b00687629f06bf0d32338556efb915f0d7ee7d2011f47f49bd9ea68853ac76049d0f9481b72bb7ab8359a9685015e31ea99e9bf4315811196133ceeaafb9e0f55a1523b16b3a4b94f29d6cda641dc5545277c33040f04730dab54a8bee3354df1b7b244ebfc0f2a490ab019c5608639df2a60d70d08b20f5530d82d280c792532748ed1f3eaa6b9364ae44b202f04fd0c5b88fd9147b009918618bad161d9ec0a26c46f99530ed1223da34f5e1da40030a2bd16b4f84b90d8280663c3e6194b241d4dea7cba544839648824d170caf78e078cb85ec06335b5af03ba31c5d068f669d4a9cf240df37307274c38a2836e9082be53aada639c30110e4a131600c3946b5cfb299b79c342973d6223d8145366f5f745cac141619840794baaded6a0e0f4e43957361c938c932f891b0fcd0bcd0917ac98cf40089a6352d22932dae785b8370cce4d61a9ff7cdcceb3c7be6bd29b4cde520dd3cfb67ff1af06d92faa93aaad421775881a177040d08188e10f01e546be5e8bbf88c28e1ea3aa006bc91098553261f84d9c25bfd8c128891d4f96f37357fb8f6e36e4df0d664ed61fb2ed09f48e513c8fcd2504cf87673ef09ecccbdd27269ccb0b135639564eabbb6cc74d4479f64f1c4c7f5e38af6305ad8",
+    "rejections": [
+     {
+      "code": "undecryptable",
+      "error": "undecryptable: MLS processing",
+      "from": "agent05",
+      "op": "agent05-000005"
+     }
+    ],
+    "restarts": 0,
+    "retain": false,
+    "sequence": 56,
+    "skipped_entries": 6,
+    "suite": "pq",
+    "waiting": []
+   }
+  },
+  "qrng_stats": {
+   "available": true,
+   "bytes": 2636,
+   "clients": {
+    "127.0.0.1": 2636
+   },
+   "mock": true,
+   "refused": 0,
+   "requests": 107
+  },
+  "adapter_trace": [
+   {
+    "actor": "agent01",
+    "command": "delegate",
+    "outcome": "ok",
+    "sequence": 1
+   },
+   {
+    "actor": "agent02",
+    "command": "admission_certificate",
+    "outcome": "ok",
+    "sequence": 1
+   },
+   {
+    "actor": "agent01",
+    "command": "submit_commit",
+    "outcome": "ok",
+    "sequence": 2
+   },
+   {
+    "actor": "agent01",
+    "command": "delegate",
+    "outcome": "ok",
+    "sequence": 3
+   },
+   {
+    "actor": "agent03",
+    "command": "admission_certificate",
+    "outcome": "ok",
+    "sequence": 1
+   },
+   {
+    "actor": "agent01",
+    "command": "submit_commit",
+    "outcome": "ok",
+    "sequence": 4
+   },
+   {
+    "actor": "agent01",
+    "command": "delegate",
+    "outcome": "ok",
+    "sequence": 5
+   },
+   {
+    "actor": "agent04",
+    "command": "admission_certificate",
+    "outcome": "ok",
+    "sequence": 1
+   },
+   {
+    "actor": "agent01",
+    "command": "submit_commit",
+    "outcome": "ok",
+    "sequence": 6
+   },
+   {
+    "actor": "agent01",
+    "command": "delegate",
+    "outcome": "ok",
+    "sequence": 7
+   },
+   {
+    "actor": "agent05",
+    "command": "admission_certificate",
+    "outcome": "ok",
+    "sequence": 1
+   },
+   {
+    "actor": "agent01",
+    "command": "submit_commit",
+    "outcome": "ok",
+    "sequence": 8
+   },
+   {
+    "actor": "agent01",
+    "command": "delegate",
+    "outcome": "ok",
+    "sequence": 9
+   },
+   {
+    "actor": "agent06",
+    "command": "admission_certificate",
+    "outcome": "ok",
+    "sequence": 1
+   },
+   {
+    "actor": "agent01",
+    "command": "submit_commit",
+    "outcome": "ok",
+    "sequence": 10
+   },
+   {
+    "actor": "agent01",
+    "command": "delegate",
+    "outcome": "ok",
+    "sequence": 11
+   },
+   {
+    "actor": "agent07",
+    "command": "admission_certificate",
+    "outcome": "ok",
+    "sequence": 1
+   },
+   {
+    "actor": "agent01",
+    "command": "submit_commit",
+    "outcome": "ok",
+    "sequence": 12
+   },
+   {
+    "actor": "agent01",
+    "command": "delegate",
+    "outcome": "ok",
+    "sequence": 13
+   },
+   {
+    "actor": "agent08",
+    "command": "admission_certificate",
+    "outcome": "ok",
+    "sequence": 1
+   },
+   {
+    "actor": "agent01",
+    "command": "submit_commit",
+    "outcome": "ok",
+    "sequence": 14
+   },
+   {
+    "actor": "agent02",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 2
+   },
+   {
+    "actor": "agent01",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 15
+   },
+   {
+    "actor": "agent03",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 2
+   },
+   {
+    "actor": "agent07",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 2
+   },
+   {
+    "actor": "agent08",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 2
+   },
+   {
+    "actor": "agent05",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 2
+   },
+   {
+    "actor": "agent06",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 2
+   },
+   {
+    "actor": "agent04",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 2
+   },
+   {
+    "actor": "agent02",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 3
+   },
+   {
+    "actor": "agent05",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 3
+   },
+   {
+    "actor": "agent01",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 16
+   },
+   {
+    "actor": "agent06",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 3
+   },
+   {
+    "actor": "agent07",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 3
+   },
+   {
+    "actor": "agent04",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 3
+   },
+   {
+    "actor": "agent03",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 3
+   },
+   {
+    "actor": "agent08",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 3
+   },
+   {
+    "actor": "agent02",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 4
+   },
+   {
+    "actor": "agent05",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 4
+   },
+   {
+    "actor": "agent01",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 17
+   },
+   {
+    "actor": "agent06",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 4
+   },
+   {
+    "actor": "agent07",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 4
+   },
+   {
+    "actor": "agent04",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 4
+   },
+   {
+    "actor": "agent03",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 4
+   },
+   {
+    "actor": "agent02",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 5
+   },
+   {
+    "actor": "agent08",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 4
+   },
+   {
+    "actor": "agent05",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 5
+   },
+   {
+    "actor": "agent01",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 18
+   },
+   {
+    "actor": "agent06",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 5
+   },
+   {
+    "actor": "agent07",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 5
+   },
+   {
+    "actor": "agent04",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 5
+   },
+   {
+    "actor": "agent03",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 5
+   },
+   {
+    "actor": "agent08",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 5
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 6
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 19
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 6
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 6
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 6
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 6
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 6
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 6
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 20
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 7
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 7
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 7
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 7
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 7
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 7
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 7
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 8
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 8
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 21
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 8
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 8
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 8
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 8
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 8
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 9
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 22
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 9
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 9
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 9
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 9
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 9
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 9
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 10
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 23
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 10
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 10
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 10
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 10
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 10
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 10
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 11
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 24
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 11
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 11
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 11
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 11
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 11
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 11
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 12
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 25
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 12
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 12
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 12
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 12
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 12
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 12
+   },
+   {
+    "actor": "agent01",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 26
+   },
+   {
+    "actor": "agent03",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 13
+   },
+   {
+    "actor": "agent07",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 13
+   },
+   {
+    "actor": "agent05",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 13
+   },
+   {
+    "actor": "agent08",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 13
+   },
+   {
+    "actor": "agent04",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 13
+   },
+   {
+    "actor": "agent02",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 13
+   },
+   {
+    "actor": "agent06",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 13
+   },
+   {
+    "actor": "agent01",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 27
+   },
+   {
+    "actor": "agent07",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 14
+   },
+   {
+    "actor": "agent04",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 14
+   },
+   {
+    "actor": "agent05",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 14
+   },
+   {
+    "actor": "agent06",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 14
+   },
+   {
+    "actor": "agent08",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 14
+   },
+   {
+    "actor": "agent03",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 14
+   },
+   {
+    "actor": "agent02",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 14
+   },
+   {
+    "actor": "agent01",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 28
+   },
+   {
+    "actor": "agent07",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 15
+   },
+   {
+    "actor": "agent04",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 15
+   },
+   {
+    "actor": "agent05",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 15
+   },
+   {
+    "actor": "agent06",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 15
+   },
+   {
+    "actor": "agent08",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 15
+   },
+   {
+    "actor": "agent03",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 15
+   },
+   {
+    "actor": "agent01",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 29
+   },
+   {
+    "actor": "agent02",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 15
+   },
+   {
+    "actor": "agent07",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 16
+   },
+   {
+    "actor": "agent04",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 16
+   },
+   {
+    "actor": "agent05",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 16
+   },
+   {
+    "actor": "agent06",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 16
+   },
+   {
+    "actor": "agent08",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 16
+   },
+   {
+    "actor": "agent03",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 16
+   },
+   {
+    "actor": "agent02",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 16
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 17
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 17
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 17
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 30
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 17
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 17
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 17
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 17
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 18
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 18
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 18
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 31
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 18
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 18
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 18
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 18
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 19
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 19
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 19
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 32
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 19
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 19
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 19
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 19
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 20
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 20
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 20
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 33
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 20
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 20
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 20
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 20
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 21
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 21
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 21
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 21
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 34
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 21
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 21
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 21
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 22
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 22
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 22
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 35
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 22
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 22
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 22
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 22
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 23
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 23
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 23
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 36
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 23
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 23
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 23
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 23
+   },
+   {
+    "actor": "agent01",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 37
+   },
+   {
+    "actor": "agent03",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 24
+   },
+   {
+    "actor": "agent04",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 24
+   },
+   {
+    "actor": "agent02",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 24
+   },
+   {
+    "actor": "agent07",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 24
+   },
+   {
+    "actor": "agent06",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 24
+   },
+   {
+    "actor": "agent05",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 24
+   },
+   {
+    "actor": "agent08",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 24
+   },
+   {
+    "actor": "agent01",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 38
+   },
+   {
+    "actor": "agent04",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 25
+   },
+   {
+    "actor": "agent05",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 25
+   },
+   {
+    "actor": "agent07",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 25
+   },
+   {
+    "actor": "agent06",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 25
+   },
+   {
+    "actor": "agent08",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 25
+   },
+   {
+    "actor": "agent03",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 25
+   },
+   {
+    "actor": "agent02",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 25
+   },
+   {
+    "actor": "agent01",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 39
+   },
+   {
+    "actor": "agent04",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 26
+   },
+   {
+    "actor": "agent05",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 26
+   },
+   {
+    "actor": "agent07",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 26
+   },
+   {
+    "actor": "agent06",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 26
+   },
+   {
+    "actor": "agent08",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 26
+   },
+   {
+    "actor": "agent03",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 26
+   },
+   {
+    "actor": "agent01",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 40
+   },
+   {
+    "actor": "agent02",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 26
+   },
+   {
+    "actor": "agent04",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 27
+   },
+   {
+    "actor": "agent05",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 27
+   },
+   {
+    "actor": "agent07",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 27
+   },
+   {
+    "actor": "agent06",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 27
+   },
+   {
+    "actor": "agent08",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 27
+   },
+   {
+    "actor": "agent03",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 27
+   },
+   {
+    "actor": "agent02",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 27
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 28
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 28
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 28
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 28
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 28
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 41
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 28
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 28
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 29
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 29
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 29
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 29
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 29
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 42
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 29
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 29
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 30
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 30
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 30
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 30
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 30
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 43
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 30
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 30
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 31
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 31
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 31
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 31
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 31
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 44
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 31
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 31
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 32
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 32
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 32
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 32
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 32
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 32
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 32
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 45
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 33
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 33
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 33
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 33
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 33
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 33
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 33
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 46
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 34
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 34
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 34
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 34
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 34
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 34
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 34
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 47
+   },
+   {
+    "actor": "agent01",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 48
+   },
+   {
+    "actor": "agent04",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 35
+   },
+   {
+    "actor": "agent02",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 35
+   },
+   {
+    "actor": "agent03",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 35
+   },
+   {
+    "actor": "agent08",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 35
+   },
+   {
+    "actor": "agent07",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 35
+   },
+   {
+    "actor": "agent05",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 35
+   },
+   {
+    "actor": "agent06",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 35
+   },
+   {
+    "actor": "agent01",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 49
+   },
+   {
+    "actor": "agent06",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 36
+   },
+   {
+    "actor": "agent07",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 36
+   },
+   {
+    "actor": "agent05",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 36
+   },
+   {
+    "actor": "agent02",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 36
+   },
+   {
+    "actor": "agent08",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 36
+   },
+   {
+    "actor": "agent04",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 36
+   },
+   {
+    "actor": "agent03",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 36
+   },
+   {
+    "actor": "agent01",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 50
+   },
+   {
+    "actor": "agent06",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 37
+   },
+   {
+    "actor": "agent07",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 37
+   },
+   {
+    "actor": "agent05",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 37
+   },
+   {
+    "actor": "agent02",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 37
+   },
+   {
+    "actor": "agent08",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 37
+   },
+   {
+    "actor": "agent04",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 37
+   },
+   {
+    "actor": "agent01",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 51
+   },
+   {
+    "actor": "agent03",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 37
+   },
+   {
+    "actor": "agent06",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 38
+   },
+   {
+    "actor": "agent07",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 38
+   },
+   {
+    "actor": "agent05",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 38
+   },
+   {
+    "actor": "agent02",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 38
+   },
+   {
+    "actor": "agent08",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 38
+   },
+   {
+    "actor": "agent04",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 38
+   },
+   {
+    "actor": "agent03",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 38
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 39
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 39
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 39
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 39
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 39
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 52
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 39
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 39
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 40
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 40
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 40
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 40
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 40
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 53
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 40
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 40
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 41
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 41
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 41
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 41
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 41
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 54
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 41
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 41
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 42
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 42
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 42
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 42
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 42
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 55
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 42
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 42
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 43
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 43
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 43
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 43
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 43
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 43
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 43
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 56
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 44
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 44
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 44
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 44
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 44
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 44
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 44
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 57
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 45
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 45
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 45
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 45
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 45
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 45
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 45
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 58
+   },
+   {
+    "actor": "agent02",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 46
+   },
+   {
+    "actor": "agent05",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 46
+   },
+   {
+    "actor": "agent01",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 59
+   },
+   {
+    "actor": "agent03",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 46
+   },
+   {
+    "actor": "agent04",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 46
+   },
+   {
+    "actor": "agent07",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 46
+   },
+   {
+    "actor": "agent08",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 46
+   },
+   {
+    "actor": "agent06",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 46
+   },
+   {
+    "actor": "agent02",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 47
+   },
+   {
+    "actor": "agent01",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 60
+   },
+   {
+    "actor": "agent03",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 47
+   },
+   {
+    "actor": "agent04",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 47
+   },
+   {
+    "actor": "agent06",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 47
+   },
+   {
+    "actor": "agent05",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 47
+   },
+   {
+    "actor": "agent08",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 47
+   },
+   {
+    "actor": "agent07",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 47
+   },
+   {
+    "actor": "agent02",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 48
+   },
+   {
+    "actor": "agent01",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 61
+   },
+   {
+    "actor": "agent03",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 48
+   },
+   {
+    "actor": "agent04",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 48
+   },
+   {
+    "actor": "agent06",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 48
+   },
+   {
+    "actor": "agent05",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 48
+   },
+   {
+    "actor": "agent08",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 48
+   },
+   {
+    "actor": "agent02",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 49
+   },
+   {
+    "actor": "agent07",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 48
+   },
+   {
+    "actor": "agent01",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 62
+   },
+   {
+    "actor": "agent03",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 49
+   },
+   {
+    "actor": "agent04",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 49
+   },
+   {
+    "actor": "agent06",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 49
+   },
+   {
+    "actor": "agent05",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 49
+   },
+   {
+    "actor": "agent08",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 49
+   },
+   {
+    "actor": "agent07",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 49
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 63
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 50
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 50
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 50
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 50
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 50
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 50
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 50
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 51
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 51
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 64
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 51
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 51
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 51
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 51
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 51
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 52
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 65
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 52
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 52
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 52
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 52
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 52
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 52
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 66
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 53
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 53
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 53
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 53
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 53
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 53
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 53
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 67
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 54
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 54
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 54
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 54
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 54
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 54
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 54
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 68
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 55
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 55
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 55
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 55
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 55
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 55
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 55
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 69
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 56
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 56
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 56
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 56
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 56
+   },
+   {
+    "actor": "agent08",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 56
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 56
+   },
+   {
+    "actor": "agent01",
+    "command": "revoke",
+    "outcome": "ok",
+    "sequence": 70
+   },
+   {
+    "actor": "agent01",
+    "command": "repair_plan",
+    "outcome": "ok",
+    "sequence": 71
+   },
+   {
+    "actor": "agent01",
+    "command": "submit_commit",
+    "outcome": "ok",
+    "sequence": 72
+   },
+   {
+    "actor": "agent01",
+    "command": "confirm_repair",
+    "outcome": "ok",
+    "sequence": 73
+   },
+   {
+    "actor": "agent03",
+    "command": "confirm_repair",
+    "outcome": "ok",
+    "sequence": 57
+   },
+   {
+    "actor": "agent05",
+    "command": "confirm_repair",
+    "outcome": "invalid_repair",
+    "sequence": 57
+   },
+   {
+    "actor": "agent04",
+    "command": "confirm_repair",
+    "outcome": "invalid_repair",
+    "sequence": 57
+   },
+   {
+    "actor": "agent07",
+    "command": "confirm_repair",
+    "outcome": "invalid_repair",
+    "sequence": 57
+   },
+   {
+    "actor": "agent06",
+    "command": "confirm_repair",
+    "outcome": "invalid_repair",
+    "sequence": 57
+   },
+   {
+    "actor": "agent02",
+    "command": "confirm_repair",
+    "outcome": "invalid_repair",
+    "sequence": 57
+   },
+   {
+    "actor": "agent02",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 58
+   },
+   {
+    "actor": "agent06",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 58
+   },
+   {
+    "actor": "agent05",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 58
+   },
+   {
+    "actor": "agent01",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 74
+   },
+   {
+    "actor": "agent07",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 58
+   },
+   {
+    "actor": "agent03",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 58
+   },
+   {
+    "actor": "agent04",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 58
+   },
+   {
+    "actor": "agent02",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 59
+   },
+   {
+    "actor": "agent03",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 59
+   },
+   {
+    "actor": "agent04",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 59
+   },
+   {
+    "actor": "agent01",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 75
+   },
+   {
+    "actor": "agent06",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 59
+   },
+   {
+    "actor": "agent05",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 59
+   },
+   {
+    "actor": "agent07",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 59
+   },
+   {
+    "actor": "agent02",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 60
+   },
+   {
+    "actor": "agent03",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 60
+   },
+   {
+    "actor": "agent04",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 60
+   },
+   {
+    "actor": "agent01",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 76
+   },
+   {
+    "actor": "agent06",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 60
+   },
+   {
+    "actor": "agent05",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 60
+   },
+   {
+    "actor": "agent02",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 61
+   },
+   {
+    "actor": "agent07",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 60
+   },
+   {
+    "actor": "agent03",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 61
+   },
+   {
+    "actor": "agent04",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 61
+   },
+   {
+    "actor": "agent01",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 77
+   },
+   {
+    "actor": "agent06",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 61
+   },
+   {
+    "actor": "agent05",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 61
+   },
+   {
+    "actor": "agent07",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 61
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 62
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 62
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 78
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 62
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 62
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 62
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 62
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 63
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 79
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 63
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 63
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 63
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 63
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 63
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 80
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 64
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 64
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 64
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 64
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 64
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 64
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 65
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 65
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 81
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 65
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 65
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 65
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 65
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 66
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 66
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 82
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 66
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 66
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 66
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 66
+   },
+   {
+    "actor": "agent03",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 67
+   },
+   {
+    "actor": "agent04",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 67
+   },
+   {
+    "actor": "agent01",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 83
+   },
+   {
+    "actor": "agent06",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 67
+   },
+   {
+    "actor": "agent07",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 67
+   },
+   {
+    "actor": "agent02",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 67
+   },
+   {
+    "actor": "agent05",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 67
+   }
+  ]
+ }
+}

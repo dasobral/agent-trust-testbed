@@ -1,0 +1,1890 @@
+{
+ "experiment": "E1",
+ "title": "Revocation fence, repair and rekey across a faulty network",
+ "hypothesis": "With the APF, the agents and the relay as separate network services, and the relay dropping, duplicating and reordering traffic: (H1) every authorized message reaches each current reader exactly once and only after an APF consumption; (H2) a read revocation stops new releases and in-flight deliveries until a repair commit removes the reader; (H3) a removed member that keeps its keys can neither decrypt nor consume later traffic; (H4) a re-granted write right needs fresh keys; (H5) the independent oracle accepts the exported trace and rejects every broken control.",
+ "result": "pass",
+ "started": 1793481642.5828462,
+ "seconds": 12.843,
+ "steps": [
+  {
+   "index": 0,
+   "do": "genesis",
+   "name": "A1 alice founds the group with the APF",
+   "status": "pass",
+   "detail": {
+    "branch": "aa618c66563792a111acd001dedacaa138c572c760d86a5bec46ece281183a1d",
+    "epoch": 0
+   },
+   "seconds": 0.695
+  },
+  {
+   "index": 1,
+   "do": "delegate",
+   "name": "A2 alice delegates read, write, admit to bob",
+   "status": "pass",
+   "detail": {
+    "revision": 1
+   },
+   "seconds": 0.039
+  },
+  {
+   "index": 2,
+   "do": "delegate",
+   "name": "A3 alice delegates read, write, admit to carol",
+   "status": "pass",
+   "detail": {
+    "revision": 2
+   },
+   "seconds": 0.04
+  },
+  {
+   "index": 3,
+   "do": "admit",
+   "name": "A4 bob joins through a certified KeyPackage",
+   "status": "pass",
+   "detail": {
+    "branch": "7f4c38a8ef0dc65cdd7e700d22d585481c92c5b5c6914da91f6ae6a80abcdb3b",
+    "epoch": 1,
+    "index": 0,
+    "subject": "bob"
+   },
+   "seconds": 0.822
+  },
+  {
+   "index": 4,
+   "do": "admit",
+   "name": "A5 carol joins through a certified KeyPackage",
+   "status": "pass",
+   "detail": {
+    "branch": "b473259d99a860c453b553c39a579f317e4330153e4c0ae161571b0b2fdb20a6",
+    "epoch": 2,
+    "index": 1,
+    "subject": "carol"
+   },
+   "seconds": 1.063
+  },
+  {
+   "index": 5,
+   "do": "check.apf",
+   "name": "A6 APF roster and frontier after admission",
+   "status": "pass",
+   "detail": {
+    "roster": [
+     "alice",
+     "bob",
+     "carol"
+    ],
+    "epoch": 2,
+    "policy_revision": 2,
+    "read_fenced": false,
+    "repair_pending": null
+   },
+   "seconds": 0.001
+  },
+  {
+   "index": 6,
+   "do": "check.frontiers",
+   "name": "A7 every agent is on the APF frontier",
+   "status": "pass",
+   "detail": {
+    "epoch": 2,
+    "agents": [
+     "alice",
+     "bob",
+     "carol"
+    ]
+   },
+   "seconds": 0.002
+  },
+  {
+   "index": 7,
+   "do": "faults",
+   "name": "B1 relay drops 25%, duplicates 25%, reorders",
+   "status": "pass",
+   "detail": {
+    "drop": 25,
+    "duplicate": 25,
+    "reorder": true,
+    "seed": 11
+   },
+   "seconds": 0.0
+  },
+  {
+   "index": 8,
+   "do": "send",
+   "name": "B2 alice sends m1",
+   "status": "pass",
+   "detail": {
+    "epoch": 2,
+    "op": "alice-000001",
+    "recipients": [
+     "bob",
+     "carol"
+    ],
+    "sent_ms": 1793481645417
+   },
+   "seconds": 0.173
+  },
+  {
+   "index": 9,
+   "do": "send",
+   "name": "B3 bob sends m2",
+   "status": "pass",
+   "detail": {
+    "epoch": 2,
+    "op": "bob-000001",
+    "recipients": [
+     "alice",
+     "carol"
+    ],
+    "sent_ms": 1793481645670
+   },
+   "seconds": 0.253
+  },
+  {
+   "index": 10,
+   "do": "send",
+   "name": "B4 carol sends m3",
+   "status": "pass",
+   "detail": {
+    "epoch": 2,
+    "op": "carol-000001",
+    "recipients": [
+     "alice",
+     "bob"
+    ],
+    "sent_ms": 1793481646046
+   },
+   "seconds": 0.376
+  },
+  {
+   "index": 11,
+   "do": "burst",
+   "name": "B5 burst: 4 interleaved messages from each agent",
+   "status": "pass",
+   "detail": {
+    "sent": 12,
+    "seconds": 4.057,
+    "sends_per_second": 3.0
+   },
+   "seconds": 4.057
+  },
+  {
+   "index": 12,
+   "do": "quiesce",
+   "name": "B5b relay drains (retransmissions and duplicates included)",
+   "status": "pass",
+   "detail": {
+    "posted": 30,
+    "fetched": 35,
+    "dropped": 11,
+    "duplicated": 5,
+    "tapped": 0,
+    "queued": {},
+    "held": []
+   },
+   "seconds": 0.511
+  },
+  {
+   "index": 13,
+   "do": "check.delivered",
+   "name": "B6 alice received m2 and m3 exactly once",
+   "status": "pass",
+   "detail": {
+    "agent": "alice",
+    "delivered": [
+     "bob-000001",
+     "carol-000001"
+    ]
+   },
+   "seconds": 0.0
+  },
+  {
+   "index": 14,
+   "do": "check.delivered",
+   "name": "B7 bob received m1 and m3 exactly once",
+   "status": "pass",
+   "detail": {
+    "agent": "bob",
+    "delivered": [
+     "alice-000001",
+     "carol-000001"
+    ]
+   },
+   "seconds": 0.0
+  },
+  {
+   "index": 15,
+   "do": "check.delivered",
+   "name": "B8 carol received m1 and m2 exactly once",
+   "status": "pass",
+   "detail": {
+    "agent": "carol",
+    "delivered": [
+     "alice-000001",
+     "bob-000001"
+    ]
+   },
+   "seconds": 0.0
+  },
+  {
+   "index": 16,
+   "do": "check.complete",
+   "name": "B9 every burst message reached every reader exactly once",
+   "status": "pass",
+   "detail": {
+    "pairs": 30,
+    "excluded": [],
+    "optional": 0
+   },
+   "seconds": 0.001
+  },
+  {
+   "index": 17,
+   "do": "check.rejections_are_duplicates",
+   "name": "B10 every rejected copy was a duplicate of a delivered message",
+   "status": "pass",
+   "detail": {
+    "alice": {
+     "undecryptable": 1
+    },
+    "bob": {
+     "undecryptable": 3
+    },
+    "carol": {
+     "undecryptable": 1
+    }
+   },
+   "seconds": 0.002
+  },
+  {
+   "index": 18,
+   "do": "check.exactly_once",
+   "name": "B11 no duplicate delivery, no delivery without APF consumption",
+   "status": "pass",
+   "detail": {
+    "deliveries": 30,
+    "consumed": 30,
+    "lost_after_consume": 0
+   },
+   "seconds": 0.027
+  },
+  {
+   "index": 19,
+   "do": "hold",
+   "name": "C1 relay holds carol's mailbox (message in flight)",
+   "status": "pass",
+   "detail": {
+    "held": true,
+    "mailbox": "carol"
+   },
+   "seconds": 0.0
+  },
+  {
+   "index": 20,
+   "do": "send",
+   "name": "C2 alice sends m4 before the revocation",
+   "status": "pass",
+   "detail": {
+    "epoch": 2,
+    "op": "alice-000006",
+    "recipients": [
+     "bob",
+     "carol"
+    ],
+    "sent_ms": 1793481650842
+   },
+   "seconds": 0.195
+  },
+  {
+   "index": 21,
+   "do": "quiesce",
+   "name": "C3 bob's copy drains; carol's copy stays in flight",
+   "status": "pass",
+   "detail": {
+    "posted": 32,
+    "fetched": 36,
+    "dropped": 11,
+    "duplicated": 5,
+    "tapped": 0,
+    "queued": {
+     "carol": 1
+    },
+    "held": [
+     "carol"
+    ]
+   },
+   "seconds": 0.41
+  },
+  {
+   "index": 22,
+   "do": "revoke",
+   "name": "C4 alice revokes carol's read right",
+   "status": "pass",
+   "detail": {
+    "read_fenced": true,
+    "revision": 84
+   },
+   "seconds": 0.042
+  },
+  {
+   "index": 23,
+   "do": "check.apf",
+   "name": "C5 the APF read fence is closed",
+   "status": "pass",
+   "detail": {
+    "roster": [
+     "alice",
+     "bob",
+     "carol"
+    ],
+    "epoch": 2,
+    "policy_revision": 3,
+    "read_fenced": true,
+    "repair_pending": null
+   },
+   "seconds": 0.001
+  },
+  {
+   "index": 24,
+   "do": "send",
+   "name": "C6 alice cannot release while fenced",
+   "status": "pass",
+   "detail": {
+    "refused": "read_fenced",
+    "error": "read_fenced"
+   },
+   "seconds": 0.075
+  },
+  {
+   "index": 25,
+   "do": "send",
+   "name": "C7 bob cannot release while fenced",
+   "status": "pass",
+   "detail": {
+    "refused": "read_fenced",
+    "error": "read_fenced"
+   },
+   "seconds": 0.074
+  },
+  {
+   "index": 26,
+   "do": "hold",
+   "name": "C8 relay releases carol's mailbox",
+   "status": "pass",
+   "detail": {
+    "held": false,
+    "mailbox": "carol"
+   },
+   "seconds": 0.0
+  },
+  {
+   "index": 27,
+   "do": "quiesce",
+   "name": "C9 carol processes the in-flight m4",
+   "status": "pass",
+   "detail": {
+    "posted": 32,
+    "fetched": 37,
+    "dropped": 11,
+    "duplicated": 5,
+    "tapped": 0,
+    "queued": {},
+    "held": []
+   },
+   "seconds": 0.459
+  },
+  {
+   "index": 28,
+   "do": "check.rejected",
+   "name": "C10 carol decrypts m4 but the APF refuses its consumption",
+   "status": "pass",
+   "detail": {
+    "agent": "carol",
+    "op": "alice-000006",
+    "first": "read_fenced",
+    "duplicates": []
+   },
+   "seconds": 0.0
+  },
+  {
+   "index": 29,
+   "do": "check.not_delivered",
+   "name": "C11 carol's application never sees m4",
+   "status": "pass",
+   "detail": {
+    "agent": "carol",
+    "not_delivered": [
+     "alice-000006"
+    ]
+   },
+   "seconds": 0.0
+  },
+  {
+   "index": 30,
+   "do": "check.delivered",
+   "name": "C12 bob received m4",
+   "status": "pass",
+   "detail": {
+    "agent": "bob",
+    "delivered": [
+     "alice-000006"
+    ]
+   },
+   "seconds": 0.0
+  },
+  {
+   "index": 31,
+   "do": "adversary",
+   "name": "D1 carol turns adversary: keeps its epoch keys, ignores its removal",
+   "status": "pass",
+   "detail": {
+    "retain": true
+   },
+   "seconds": 0.011
+  },
+  {
+   "index": 32,
+   "do": "repair",
+   "name": "D2 alice commits the repair; bob confirms; the fence reopens",
+   "status": "pass",
+   "detail": {
+    "branch": "ee6140aea82c44e04168a8c2097682a334d3edeb48637207a0b318575c372950",
+    "epoch": 3,
+    "evidence": "pair",
+    "index": 2,
+    "opened": false,
+    "removed": [
+     "carol"
+    ],
+    "read_fenced_after": false
+   },
+   "seconds": 0.767
+  },
+  {
+   "index": 33,
+   "do": "check.apf",
+   "name": "D3 carol is out of the roster and the fence is open",
+   "status": "pass",
+   "detail": {
+    "roster": [
+     "alice",
+     "bob"
+    ],
+    "epoch": 3,
+    "policy_revision": 3,
+    "read_fenced": false,
+    "repair_pending": null
+   },
+   "seconds": 0.001
+  },
+  {
+   "index": 34,
+   "do": "tap",
+   "name": "D4 the relay leaks every copy for bob to carol",
+   "status": "pass",
+   "detail": {
+    "enabled": true,
+    "observer": "carol",
+    "victim": "bob"
+   },
+   "seconds": 0.0
+  },
+  {
+   "index": 35,
+   "do": "send",
+   "name": "D5 alice sends m6 after the repair",
+   "status": "pass",
+   "detail": {
+    "epoch": 3,
+    "op": "alice-000008",
+    "recipients": [
+     "bob"
+    ],
+    "sent_ms": 1793481652854
+   },
+   "seconds": 0.169
+  },
+  {
+   "index": 36,
+   "do": "quiesce",
+   "name": "D6 relay drains",
+   "status": "pass",
+   "detail": {
+    "posted": 33,
+    "fetched": 39,
+    "dropped": 11,
+    "duplicated": 5,
+    "tapped": 1,
+    "queued": {},
+    "held": []
+   },
+   "seconds": 0.411
+  },
+  {
+   "index": 37,
+   "do": "check.delivered",
+   "name": "D7 bob received m6",
+   "status": "pass",
+   "detail": {
+    "agent": "bob",
+    "delivered": [
+     "alice-000008"
+    ]
+   },
+   "seconds": 0.0
+  },
+  {
+   "index": 38,
+   "do": "check.adversary",
+   "name": "D8 carol's retained keys cannot decrypt m6 and the APF refuses it",
+   "status": "pass",
+   "detail": {
+    "agent": "carol",
+    "attempts": [
+     {
+      "consume": "unauthorized",
+      "decrypted": false,
+      "from": "alice",
+      "mls": "refused: ValidationError(WrongEpoch)",
+      "op": "alice-000008",
+      "tapped_from": "bob"
+     }
+    ]
+   },
+   "seconds": 0.0
+  },
+  {
+   "index": 39,
+   "do": "revoke",
+   "name": "E1 alice revokes bob's write right",
+   "status": "pass",
+   "detail": {
+    "read_fenced": false,
+    "revision": 93
+   },
+   "seconds": 0.062
+  },
+  {
+   "index": 40,
+   "do": "send",
+   "name": "E2 bob cannot release without write",
+   "status": "pass",
+   "detail": {
+    "refused": "unauthorized",
+    "error": "unauthorized"
+   },
+   "seconds": 0.074
+  },
+  {
+   "index": 41,
+   "do": "grant",
+   "name": "E3 alice re-grants write at generation 1: a rekey offer only",
+   "status": "pass",
+   "detail": {
+    "pending": true
+   },
+   "seconds": 0.019
+  },
+  {
+   "index": 42,
+   "do": "send",
+   "name": "E4 the offer alone does not restore write",
+   "status": "pass",
+   "detail": {
+    "refused": "unauthorized",
+    "error": "unauthorized"
+   },
+   "seconds": 0.073
+  },
+  {
+   "index": 43,
+   "do": "rekey",
+   "name": "E5 bob commits a new signature key and incarnation",
+   "status": "pass",
+   "detail": {
+    "branch": "ff6e2be118777060625b40bdcf4150080f2bac870757e2ded96466111177cf9f",
+    "epoch": 4,
+    "generation": 1,
+    "public_key": "a78e2de8c952ec7b236deaeeaa17e6953b240c0f4a15af011de891b26b0f91e87a96aec607a382380d919a19d34cf46202b29dddab1c48b11cb5a7d7e7c82cc11b965e188e82c464ac253034d24f1870b918e502243b87e35cd1aab85ef0df262a0b914ce55406aad511b7141dd288c49fef631a764369c4c718173a93166546863caa2685bb985ad25ce77c2838fc9dfd6b25c4f71e552e88a717fe8fd7918ea4c1f5791cd26933254b84a7025e10e0da60f6be288fa27cb7faa8cd6b4676275162598f7c917c625bd6d568a8cbf3eab4b95a148190cafea6d00bad763c01079e45f7d8713679ac554b449b9ce433d071eb0a327aaae656125aa6f78784717a08c17c04b2166445abf4bc1b951a1f8f8001de0a4cc516e67ff4b72d5e0506158df0ba39b13b6b5ba922c8715127519782e0d57ca857580f19081d69859ddd956d77baaa8e4753f3a4ff8dc0d0804909f83e1fcd61a5cff35b7c6d190089dd52ed427378826ef61a3622da00ff39888d37ae7f8ad90d03a1f4324767d1195a2d70204bfa848808ad70577520294e5024e95df58497977daba3b87f04daf38f0e5f8ecf67b985f4c91f78e66b6ff50d1568a0f33681e6ec1f145b8099cca6905ff2fe66b1b3ad98b19e9fee1d5f26360d1d6924e3fa6429523afc659dd0fca3bc706a4902a02cb7e0437059841aaabea23a4ad3728e3739fd30e585db63434efa404b816f97b02e1328925f6ce3f7b61363474f16a385233cd81632af38b55e59639e1eb43e88c2f46cb8a72258d806b4b7dff9a7d0ba23c212603153dbb9833969db2885f6b8ef28c7233d351706a7d95fe2b16ff3961cad57ad4b91ab0e76f3490def55d4c10171c5fbca7fb1f0e905719c74f526fd3d68ed3174febe81c8256058d43cb7b867a294f5307380e0186176c658ab086928b39b1fde9049b6f5a62f4d8b16f2a899d31d86af910776ed33be335a7d81d94398476ce7e1168ae2da4db944c7faeba89fdbc5cfeb6e7067033986e8781c3f9841048a30299c69d6faa47a6f1d90fc6aeceda47e0bc930e39af8754538a3814e0092c137df4fcfe0047c60c33f1d6b4781707852e792b35640ee8e00716196819fd017e448354b4ac4cf4ef77d214f9d30103e533db6da54f3604adf1b2b860a1dbb13273b41894ea6febc6d9ac018868d4ae4ebf97f79cf4db648b0479010e74b5f262d12cf2990ed97c556c8a1464519528efc28bdf4f3c090c50bb40aacef0da073be57cf190df376083638f39f59f1640e09da897adfb75326112020fdaf2f0c8c55e82f7ed1b5283ed6512bfd451cab6b8b941533a8cec25f5fdbe27656f1d12b76a0b109a0d36b7ecd4f5cf1a82a36b1c100f330b4c277ac92c182803857b1829993a104c19a051dde3747672f5986334066993c6f9e26cb3c574ed9661c23c676647506edbbf62ab91047b7d21918726c4820dc633097e7dfde3976e6f8d442765be59d0ecb820fd3f278f05599d4a78a44c4019bd6718183d3ae0c69e4fb7daf10c770c2efb9792712e2ac2cf47d77934d58f54a3f54975fbe3500505b0b05f0457fce4de20fc52960848caa1c45fbe5549a9088632979f0c911aad74bb0cb3ebbcd10dbb3c1e4552ccc040d3457edd083c261d6392b1178b7709f11fc2571ac167ec8262a457c2645ae42e761f8e90c350ffbd293c8e35e508af6e2e73b39f787f61e47169236793cfc2c643c861cd7ab697f1ca9883b652706050a18f33771a96d56b44bf3a9e4ebb9a8bc3c16c736981ef4a327b845de4e778cee310854ace9113f77850dabdcd30aad10af1883859d596547347e7275808ea9a4ca434627379a14bb87",
+    "right": "write"
+   },
+   "seconds": 0.69
+  },
+  {
+   "index": 44,
+   "do": "send",
+   "name": "E6 bob sends m8 with its new key",
+   "status": "pass",
+   "detail": {
+    "epoch": 4,
+    "op": "bob-000009",
+    "recipients": [
+     "alice"
+    ],
+    "sent_ms": 1793481654353
+   },
+   "seconds": 0.168
+  },
+  {
+   "index": 45,
+   "do": "quiesce",
+   "name": "E7 relay drains",
+   "status": "pass",
+   "detail": {
+    "posted": 34,
+    "fetched": 41,
+    "dropped": 11,
+    "duplicated": 6,
+    "tapped": 1,
+    "queued": {},
+    "held": []
+   },
+   "seconds": 0.512
+  },
+  {
+   "index": 46,
+   "do": "check.delivered",
+   "name": "E8 alice received m8",
+   "status": "pass",
+   "detail": {
+    "agent": "alice",
+    "delivered": [
+     "bob-000009"
+    ]
+   },
+   "seconds": 0.0
+  },
+  {
+   "index": 47,
+   "do": "check.frontiers",
+   "name": "F1 alice and bob are on the APF frontier",
+   "status": "pass",
+   "detail": {
+    "epoch": 4,
+    "agents": [
+     "alice",
+     "bob"
+    ]
+   },
+   "seconds": 0.001
+  },
+  {
+   "index": 48,
+   "do": "check.complete",
+   "name": "F2 every message reached every certified reader exactly once, except the fenced m4",
+   "status": "pass",
+   "detail": {
+    "pairs": 33,
+    "excluded": [
+     "carol:alice-000006"
+    ],
+    "optional": 0
+   },
+   "seconds": 0.001
+  },
+  {
+   "index": 49,
+   "do": "check.rejections_are_duplicates",
+   "name": "F2b the honest agents rejected only duplicates",
+   "status": "pass",
+   "detail": {
+    "alice": {
+     "undecryptable": 2
+    },
+    "bob": {
+     "undecryptable": 3
+    }
+   },
+   "seconds": 0.002
+  },
+  {
+   "index": 50,
+   "do": "check.exactly_once",
+   "name": "F2c no delivery without APF consumption, over the whole run",
+   "status": "pass",
+   "detail": {
+    "deliveries": 33,
+    "consumed": 33,
+    "lost_after_consume": 0
+   },
+   "seconds": 0.037
+  },
+  {
+   "index": 51,
+   "do": "check.oracle",
+   "name": "F3 the independent oracle accepts the exported APF trace",
+   "status": "pass",
+   "detail": {
+    "oracle": "oracle.py",
+    "events": 130,
+    "kinds": {
+     "admit": 2,
+     "allocate": 22,
+     "allow": 6,
+     "confirm": 2,
+     "consume": 33,
+     "deny": 2,
+     "emit": 18,
+     "init": 1,
+     "persist": 18,
+     "recover": 5,
+     "rekey": 1,
+     "release": 18,
+     "repair_open": 1,
+     "repair_stage": 1
+    }
+   },
+   "seconds": 0.229
+  },
+  {
+   "index": 52,
+   "do": "check.broken_controls",
+   "name": "F4 the oracle rejects every broken control derived from the trace",
+   "status": "pass",
+   "detail": {
+    "rejected": {
+     "release after the read denial": "read_fenced",
+     "fence opened by API only (no repair commit)": "invalid_repair",
+     "fence opened without confirmation": "unconfirmed",
+     "repair that keeps the revoked reader": "invalid_repair",
+     "release cover that omits a reader": "unsound_cover",
+     "second envelope under one operation": "binding_mismatch",
+     "replayed consumption": "replay",
+     "rekey that reuses another member's key": "stale_key"
+    },
+    "skipped": []
+   },
+   "seconds": 0.287
+  },
+  {
+   "index": 53,
+   "do": "check.entropy",
+   "name": "F5 every node drew its randomness from the QRNG service, with no failure",
+   "status": "pass",
+   "detail": {
+    "nodes": {
+     "apf": {
+      "bytes": 96,
+      "failures": 0,
+      "key_exchange": "none (plain HTTP)",
+      "post_quantum": false,
+      "requests": 3,
+      "source": "qrng"
+     },
+     "alice": {
+      "bytes": 556,
+      "failures": 0,
+      "key_exchange": "none (plain HTTP)",
+      "post_quantum": false,
+      "requests": 19,
+      "source": "qrng"
+     },
+     "bob": {
+      "bytes": 344,
+      "failures": 0,
+      "key_exchange": "none (plain HTTP)",
+      "post_quantum": false,
+      "requests": 14,
+      "source": "qrng"
+     },
+     "carol": {
+      "bytes": 212,
+      "failures": 0,
+      "key_exchange": "none (plain HTTP)",
+      "post_quantum": false,
+      "requests": 10,
+      "source": "qrng"
+     }
+    },
+    "qrng_service": {
+     "available": true,
+     "bytes": 1208,
+     "clients": {
+      "127.0.0.1": 1208
+     },
+     "mock": true,
+     "refused": 0,
+     "requests": 46
+    }
+   },
+   "seconds": 0.002
+  },
+  {
+   "index": 54,
+   "do": "check.no_errors",
+   "name": "F6 the honest agents logged no processing error",
+   "status": "pass",
+   "detail": {
+    "agents": [
+     "alice",
+     "bob"
+    ]
+   },
+   "seconds": 0.001
+  }
+ ],
+ "skipped_steps": 0,
+ "backend": "local",
+ "topology": "three-agents",
+ "entropy": {
+  "source": "qrng"
+ },
+ "stack": {
+  "agent-trust": "f21afef26cd5a87ff02e2c53faecbd50553eeb71",
+  "openmls": "93ad743ebe55d8983558ded3876729a00b8c291c",
+  "openmls_libcrux_crypto": "93ad743ebe55d8983558ded3876729a00b8c291c",
+  "openmls_qrand": "868f058f5e9939161b5925d9105f5979c0ad748c",
+  "testbed": "6c77d1b1acbd51e402eda3d77e2df1710d242160-dirty"
+ },
+ "observations": {
+  "apf_state": {
+   "branch": "ff6e2be118777060625b40bdcf4150080f2bac870757e2ded96466111177cf9f",
+   "epoch": 4,
+   "grants": [
+    {
+     "active": true,
+     "generation": 0,
+     "right": "read",
+     "subject": "alice"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "write",
+     "subject": "alice"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "admin",
+     "subject": "alice"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "admit",
+     "subject": "alice"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "read",
+     "subject": "bob"
+    },
+    {
+     "active": true,
+     "generation": 1,
+     "right": "write",
+     "subject": "bob"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "admit",
+     "subject": "bob"
+    },
+    {
+     "active": false,
+     "generation": 0,
+     "right": "read",
+     "subject": "carol"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "write",
+     "subject": "carol"
+    },
+    {
+     "active": true,
+     "generation": 0,
+     "right": "admit",
+     "subject": "carol"
+    }
+   ],
+   "group": "lab",
+   "policy_revision": 5,
+   "read_fenced": false,
+   "repair_pending": null,
+   "roster": [
+    "alice",
+    "bob"
+   ]
+  },
+  "relay_stats": {
+   "dropped": 11,
+   "duplicated": 6,
+   "expired": 0,
+   "faults": {
+    "drop": 25,
+    "duplicate": 25,
+    "reorder": true
+   },
+   "fetched": 41,
+   "handshake": {
+    "lab": 4
+   },
+   "held": [],
+   "hidden": {},
+   "key_packages": [
+    "bob",
+    "carol"
+   ],
+   "leased": 0,
+   "pending": 0,
+   "posted": 34,
+   "queued": {},
+   "reversed": [],
+   "tapped": 1
+  },
+  "agents": {
+   "alice": {
+    "adversary": [],
+    "branch": "ff6e2be118777060625b40bdcf4150080f2bac870757e2ded96466111177cf9f",
+    "confirmations": [
+     {
+      "outcome": "ok",
+      "response": {
+       "evidence": null,
+       "opened": false
+      }
+     }
+    ],
+    "cursor": 4,
+    "entropy": {
+     "bytes": 556,
+     "failures": 0,
+     "key_exchange": "none (plain HTTP)",
+     "post_quantum": false,
+     "requests": 19,
+     "source": "qrng"
+    },
+    "epoch": 4,
+    "errors": [],
+    "future": 0,
+    "group": "lab",
+    "inbox": 11,
+    "membership": "member",
+    "name": "alice",
+    "polls": 83,
+    "public_key": "aaeee4ae528cf0feb4c79af9c72bc5eee3583ba89bc833894ce2a2b851f383328d38cd79cfe7c5a33ef3b7598b8bf8584e87d8e4410ec12c34798801511833b643d393c4813ae02353f4a3c2cbf63fbb4521fb1bee22754ac28ad3081c386cce109d25d1208e014c6291e6215b9c35fa70dd7f9f89b2e0ff80207c2e4307e1cd206feffdd5b490cc85ca41f0acb61acbf5355e187995962f30f281771d7c6493a01cd0de1756c8e79e9b245cccec0b97297f518190ea5c5f3874e599b1d3da98200f2d0c5b9471881220ee684bf8fa20b5155e55990f116c8e63e9aab0e8e799e5f2c20609c27f342130feb496ece1cec406bec9e9199d6c96f1130e700169065b67d9457cbb8558e06728223a56f78291f4dff7693d09968472b2e299cf6d6b7c36d2328291b379bcd72c2b3e49cb0d68df826f4e414e576d45aea00469879bd3ed440caf579bdff2a564999b47efee26990f8db328b7ee3b568be07f66b9496d84cdc4fd5c296940f0ac67ee94571894636f87b766e2e11a6dbd73196d2a1cd7af05b41ce4a5ac3cb830346cd23e04ef2f832543884bd42df0fc9452d928be5574b1df1a9a6b97740f41bfbcdf4e314d860b982c0b521183ca1af0f3540109ce17b032a2a9af7192ab7996e7a89a27959260a3774c3966ec7ed9c49ff53abb175bdf9c05c46fe25d54b84c1a57213d412415335c222023eb41b39d968b3ee1bc0ceedb40d67dec9d945a012287401d6673aa291eca8767bd81d6cb78c397e5d477d8cc6f321092ea4899d69ed258d6d8c7fab3aef3f078e3323ac67d119a46da7f8ced94c1675c266111b62a2e28da405b0fb10f9d85ed23ffe93925899fadd11dfc01050b9688011db1d492390f700efa8cd5b2dc5e1123f8a083460b61b6416042b68b7757807ce20f3a12ec7acfd109714be0f936c4ba915f48717c7b01d188b8e3e95270afcd7e486375a55e5fa61892829718ed96ad6e97ca57e96a8acf2621b7ef8febc4f233a507a9120ae7aa29432ab0f891e92249056a7be92c6b637ceb281d9b01068133c199510ac5a219453beb181a673d9b8ce475851da2fb630ccb3d606534a97b03935aa40cdabe3b24758f54ac65214ba0030dd5b5e1946afff7bcd4446474d2ccf9008fd643236415e5bb11935fc7eb027fb0079f865d8a4307b8faa575222f7638de8c90960c3c167a15df62cb13f051269806cddd3d9e394b944f62931b213a8626f0c1ab580cdb8915456fb98a7291c550708b78bccdb605b6f0f867f125ef9dd0e27be3c02286a00b957f2a9cdc19f06b977297b930b91e343836f57bb7429532eb59a43719201f52bceda5bac302c3d560f9a2192fa1945b9b9c4fee6d0356b18dd11dc21dd0a5b3950210d7353bac562583e87290e0b75a0bba6bd8138b0d29b8171d46317367c977f1bd37ea5931aa02e0a4c21a7b3b378b00cd2f678faf42e228561a031e8da774041eada5addcc7246c84a65956125dc868c3ee8f44cb3a0290232903447e56d80388d7bba9d0565547d18269ec9c8da4ea80ed48c970d56231c1cd1538023c277ad9ed45f962a6c072fdececb185663d6226a778c7630f3a4ada10e4d64cbd70416bbf2f93ab1b991c1b9b75270f7171fa7b38c47b1b6c181bf87da30f0b5052c35c635a0c43d76f481b5259f1c845a53a249f73a1cdafaacf7b024f0e32afed5a6b4300383541b16c6fffb276db812af029695c24ff7ed155c86f0c2b0dd83fe02fa88235d54bafb78ce1142d99c5457e157f47f0530a34d4c2e68dfd581d36bdf9d169bfda2837b739df02cce9d23c8fe3bf43ffaa51c92b076c1465ea9c9206cf206e4bf7f40146ee2b",
+    "rejections": [
+     {
+      "code": "undecryptable",
+      "error": "undecryptable: MLS processing",
+      "from": "carol",
+      "op": "carol-000002"
+     },
+     {
+      "code": "undecryptable",
+      "error": "undecryptable: MLS processing",
+      "from": "bob",
+      "op": "bob-000009"
+     }
+    ],
+    "restarts": 0,
+    "retain": false,
+    "sequence": 51,
+    "skipped_entries": 0,
+    "suite": "pq",
+    "waiting": []
+   },
+   "bob": {
+    "adversary": [],
+    "branch": "ff6e2be118777060625b40bdcf4150080f2bac870757e2ded96466111177cf9f",
+    "confirmations": [
+     {
+      "outcome": "ok",
+      "response": {
+       "evidence": "pair",
+       "opened": true
+      }
+     }
+    ],
+    "cursor": 4,
+    "entropy": {
+     "bytes": 344,
+     "failures": 0,
+     "key_exchange": "none (plain HTTP)",
+     "post_quantum": false,
+     "requests": 14,
+     "source": "qrng"
+    },
+    "epoch": 4,
+    "errors": [],
+    "future": 0,
+    "group": "lab",
+    "inbox": 12,
+    "membership": "member",
+    "name": "bob",
+    "polls": 85,
+    "public_key": "a78e2de8c952ec7b236deaeeaa17e6953b240c0f4a15af011de891b26b0f91e87a96aec607a382380d919a19d34cf46202b29dddab1c48b11cb5a7d7e7c82cc11b965e188e82c464ac253034d24f1870b918e502243b87e35cd1aab85ef0df262a0b914ce55406aad511b7141dd288c49fef631a764369c4c718173a93166546863caa2685bb985ad25ce77c2838fc9dfd6b25c4f71e552e88a717fe8fd7918ea4c1f5791cd26933254b84a7025e10e0da60f6be288fa27cb7faa8cd6b4676275162598f7c917c625bd6d568a8cbf3eab4b95a148190cafea6d00bad763c01079e45f7d8713679ac554b449b9ce433d071eb0a327aaae656125aa6f78784717a08c17c04b2166445abf4bc1b951a1f8f8001de0a4cc516e67ff4b72d5e0506158df0ba39b13b6b5ba922c8715127519782e0d57ca857580f19081d69859ddd956d77baaa8e4753f3a4ff8dc0d0804909f83e1fcd61a5cff35b7c6d190089dd52ed427378826ef61a3622da00ff39888d37ae7f8ad90d03a1f4324767d1195a2d70204bfa848808ad70577520294e5024e95df58497977daba3b87f04daf38f0e5f8ecf67b985f4c91f78e66b6ff50d1568a0f33681e6ec1f145b8099cca6905ff2fe66b1b3ad98b19e9fee1d5f26360d1d6924e3fa6429523afc659dd0fca3bc706a4902a02cb7e0437059841aaabea23a4ad3728e3739fd30e585db63434efa404b816f97b02e1328925f6ce3f7b61363474f16a385233cd81632af38b55e59639e1eb43e88c2f46cb8a72258d806b4b7dff9a7d0ba23c212603153dbb9833969db2885f6b8ef28c7233d351706a7d95fe2b16ff3961cad57ad4b91ab0e76f3490def55d4c10171c5fbca7fb1f0e905719c74f526fd3d68ed3174febe81c8256058d43cb7b867a294f5307380e0186176c658ab086928b39b1fde9049b6f5a62f4d8b16f2a899d31d86af910776ed33be335a7d81d94398476ce7e1168ae2da4db944c7faeba89fdbc5cfeb6e7067033986e8781c3f9841048a30299c69d6faa47a6f1d90fc6aeceda47e0bc930e39af8754538a3814e0092c137df4fcfe0047c60c33f1d6b4781707852e792b35640ee8e00716196819fd017e448354b4ac4cf4ef77d214f9d30103e533db6da54f3604adf1b2b860a1dbb13273b41894ea6febc6d9ac018868d4ae4ebf97f79cf4db648b0479010e74b5f262d12cf2990ed97c556c8a1464519528efc28bdf4f3c090c50bb40aacef0da073be57cf190df376083638f39f59f1640e09da897adfb75326112020fdaf2f0c8c55e82f7ed1b5283ed6512bfd451cab6b8b941533a8cec25f5fdbe27656f1d12b76a0b109a0d36b7ecd4f5cf1a82a36b1c100f330b4c277ac92c182803857b1829993a104c19a051dde3747672f5986334066993c6f9e26cb3c574ed9661c23c676647506edbbf62ab91047b7d21918726c4820dc633097e7dfde3976e6f8d442765be59d0ecb820fd3f278f05599d4a78a44c4019bd6718183d3ae0c69e4fb7daf10c770c2efb9792712e2ac2cf47d77934d58f54a3f54975fbe3500505b0b05f0457fce4de20fc52960848caa1c45fbe5549a9088632979f0c911aad74bb0cb3ebbcd10dbb3c1e4552ccc040d3457edd083c261d6392b1178b7709f11fc2571ac167ec8262a457c2645ae42e761f8e90c350ffbd293c8e35e508af6e2e73b39f787f61e47169236793cfc2c643c861cd7ab697f1ca9883b652706050a18f33771a96d56b44bf3a9e4ebb9a8bc3c16c736981ef4a327b845de4e778cee310854ace9113f77850dabdcd30aad10af1883859d596547347e7275808ea9a4ca434627379a14bb87",
+    "rejections": [
+     {
+      "code": "undecryptable",
+      "error": "undecryptable: MLS processing",
+      "from": "carol",
+      "op": "carol-000001"
+     },
+     {
+      "code": "undecryptable",
+      "error": "undecryptable: MLS processing",
+      "from": "carol",
+      "op": "carol-000002"
+     },
+     {
+      "code": "undecryptable",
+      "error": "undecryptable: MLS processing",
+      "from": "carol",
+      "op": "carol-000003"
+     }
+    ],
+    "restarts": 0,
+    "retain": false,
+    "sequence": 45,
+    "skipped_entries": 0,
+    "suite": "pq",
+    "waiting": []
+   },
+   "carol": {
+    "adversary": [
+     {
+      "consume": "unauthorized",
+      "decrypted": false,
+      "from": "alice",
+      "mls": "refused: ValidationError(WrongEpoch)",
+      "op": "alice-000008",
+      "tapped_from": "bob"
+     }
+    ],
+    "branch": "b473259d99a860c453b553c39a579f317e4330153e4c0ae161571b0b2fdb20a6",
+    "confirmations": [],
+    "cursor": 2,
+    "entropy": {
+     "bytes": 212,
+     "failures": 0,
+     "key_exchange": "none (plain HTTP)",
+     "post_quantum": false,
+     "requests": 10,
+     "source": "qrng"
+    },
+    "epoch": 2,
+    "errors": [],
+    "future": 0,
+    "group": "lab",
+    "inbox": 10,
+    "membership": "member",
+    "name": "carol",
+    "polls": 98,
+    "public_key": "d006aa94dd082f3a0e4ea833d8fbfa63ff282ec92389f98ac39bd3f8abb4b1a72d5e02fb62d64df188528edd8e03e1d3887ca3f66e08b09c8f65f49544cb96d4c529cd71ecd5098815f0b17e2c3c6f127511cd99e1980a478ef29c121c1812d1787082acb6a7f1cc0d77925d8c5c53aab4b539be47e4fb04cea4ed43039ff082f1e0420b36fe37c58044b4f0c859011e2dfc7cc1e940e6ebc7fd4743432e0f0544c8f09ca031835ef883fe6338c8e09870102c0b0bbf27eafbfd607aff49c349ac68aac38494c6c8a5bcd118b6f89b61e770c119728a7d7e891e1ee1ad8c546608bb7cbcd3dab6e8c0b115c6f713c96acfc65ec968711fd6ffe3a13009b4de6f1c04af15dfe93901c5fd6d4666253558962020797dc6f7ed2e8410b126a5e74eed5939e82aef0089197cf7f514ac9a2d29cf9fea93b1c246ba57e7e830b0a112a21b6ddf2913f9ba8389012e9f39326d7418ca4d6f391f3c89b450cbf390534220b8c88a14a8d4e79f7f0a204d94b6154c01cfb878b3fb284d2bf6a3246a98780fbb6dd160bd50f04f3e90494aa61774f1df1293cbc8d011e736a06cfe2c0fc029ffa45a1e344f38fe436a6287231cb303536d128551a4dc7dc8696e3c3aae03f9e7b99fa99603c5e69ec606369a65d7afc729b7f6c6cd7bb4d3372680602f72596ed9f822e96ec617c377f2540fd617f70674af0eff3fdc1894023230a815f67bed3ba2c33623b9b345646551a08053bab7ebdc2e1b9eab4e4a7639cb40c7125ee7b307b28a65019936bf512e8ee8ab99025288ec7778b45ba18c044f5851c0d69dd4fd9daa52c1ec8a67390f83093e5d77fdadfb1168d2dca8b346c8df88c32bdce4a34fe5a6e401f2ff51e23b702a094841b8968156521d089d2f87825e5839b0f11ed51708c7304524ab3fb8d00951c3b1d2f68ff2706b5d9fb65ec2edab14349ec3f1c1156454ebbc6385b573d81a3b2c4cf31123936b34c87838533d086b32d7ab15ab47bf2348000ed6666ae5cf655f438d4cc65ac4f81f095e235e5b74b086feb7c8fe0100577bcfc796de6fc52672d2034139d70afb0bc65f4bde8437ac2f18a70fa4b596ecf69a56846f24b5cb11bfdc3b48b3b0e61fa70dd19ed8ff4e5ffacf2e0bb8c7e05dd2a5233538e1223d55defc0737254fde514ce3e7d8c037e0ae318a4f1e24dd1c96cf062508c44d1e107ce58aea4fe1e276ee41aa36d6b42f0952bf51933251d8839f1469b4b3d2805ee24ddcabc7b1cf1a8d3ad5313dd30656a6052ca6440af3e3dd27c154379a75402fd7c7fc9e25946d51cbf1b82a2b4418cda047671a9e708a65bf0b1f2991e43e1b3f04616ee9f5a50bdd1a7f48c1f0e1ac31945c761db299926881934677016fd92711b6f1bb5433cbf6c04ce6935b9af715e390890330cd6ed9d2081eb912e269717a61aef35192665635bb026ad25b9a8f3d9df6445bc86cca50890330fcb6129ecb7b4ea9de9c4aaf9428b593d973f5cee43cd0b75a9c876c49758175a07b05eefc2c38dbd824f659d01a60c68772900bc770828a46727a70b69625c5c4615f47fdd4e2b7e2695e18700a0697ff19a60a0ccf9c7755b9f49b98412f585b0d85df2f2c09eae01710107e6b2dfa64fb676c11afbbdedd3c823526538cd6089a557cef935abb6ce9e2cf90f1395ed7456e0f76415f852eba0958b156f961a075e4cdf8b6df7e9b4e2ad11c9d42be3209ec711f47447cc41238990d9e35b1b82c3f4e375cfd95dbc85b5643f5f0db1624acee7aa1800dce8e8341583abdedbe994c1ca287ed2683c22f84be56e580988081b4ba32e4d27f55427cdff73e57a0ee633c9358d21694bae66a8084",
+    "rejections": [
+     {
+      "code": "undecryptable",
+      "error": "undecryptable: MLS processing",
+      "from": "alice",
+      "op": "alice-000004"
+     },
+     {
+      "code": "read_fenced",
+      "error": "read_fenced",
+      "from": "alice",
+      "op": "alice-000006"
+     }
+    ],
+    "restarts": 0,
+    "retain": true,
+    "sequence": 33,
+    "skipped_entries": 1,
+    "suite": "pq",
+    "waiting": []
+   }
+  },
+  "qrng_stats": {
+   "available": true,
+   "bytes": 1208,
+   "clients": {
+    "127.0.0.1": 1208
+   },
+   "mock": true,
+   "refused": 0,
+   "requests": 46
+  },
+  "adapter_trace": [
+   {
+    "actor": "alice",
+    "command": "delegate",
+    "outcome": "ok",
+    "sequence": 1
+   },
+   {
+    "actor": "alice",
+    "command": "delegate",
+    "outcome": "ok",
+    "sequence": 2
+   },
+   {
+    "actor": "bob",
+    "command": "admission_certificate",
+    "outcome": "ok",
+    "sequence": 1
+   },
+   {
+    "actor": "alice",
+    "command": "submit_commit",
+    "outcome": "ok",
+    "sequence": 3
+   },
+   {
+    "actor": "carol",
+    "command": "admission_certificate",
+    "outcome": "ok",
+    "sequence": 1
+   },
+   {
+    "actor": "alice",
+    "command": "submit_commit",
+    "outcome": "ok",
+    "sequence": 4
+   },
+   {
+    "actor": "alice",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 5
+   },
+   {
+    "actor": "alice",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 6
+   },
+   {
+    "actor": "alice",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 7
+   },
+   {
+    "actor": "alice",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 8
+   },
+   {
+    "actor": "bob",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 2
+   },
+   {
+    "actor": "bob",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 3
+   },
+   {
+    "actor": "carol",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 2
+   },
+   {
+    "actor": "bob",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 4
+   },
+   {
+    "actor": "bob",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 5
+   },
+   {
+    "actor": "bob",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 6
+   },
+   {
+    "actor": "carol",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 3
+   },
+   {
+    "actor": "alice",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 9
+   },
+   {
+    "actor": "carol",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 4
+   },
+   {
+    "actor": "carol",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 5
+   },
+   {
+    "actor": "carol",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 6
+   },
+   {
+    "actor": "carol",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 7
+   },
+   {
+    "actor": "alice",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 10
+   },
+   {
+    "actor": "alice",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 11
+   },
+   {
+    "actor": "alice",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 12
+   },
+   {
+    "actor": "alice",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 13
+   },
+   {
+    "actor": "bob",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 7
+   },
+   {
+    "actor": "alice",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 14
+   },
+   {
+    "actor": "bob",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 8
+   },
+   {
+    "actor": "bob",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 9
+   },
+   {
+    "actor": "carol",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 8
+   },
+   {
+    "actor": "bob",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 10
+   },
+   {
+    "actor": "bob",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 11
+   },
+   {
+    "actor": "bob",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 12
+   },
+   {
+    "actor": "carol",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 9
+   },
+   {
+    "actor": "carol",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 10
+   },
+   {
+    "actor": "carol",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 11
+   },
+   {
+    "actor": "carol",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 12
+   },
+   {
+    "actor": "carol",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 13
+   },
+   {
+    "actor": "alice",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 15
+   },
+   {
+    "actor": "bob",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 13
+   },
+   {
+    "actor": "alice",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 16
+   },
+   {
+    "actor": "alice",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 17
+   },
+   {
+    "actor": "alice",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 18
+   },
+   {
+    "actor": "alice",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 19
+   },
+   {
+    "actor": "alice",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 20
+   },
+   {
+    "actor": "bob",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 14
+   },
+   {
+    "actor": "bob",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 15
+   },
+   {
+    "actor": "carol",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 14
+   },
+   {
+    "actor": "bob",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 16
+   },
+   {
+    "actor": "bob",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 17
+   },
+   {
+    "actor": "bob",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 18
+   },
+   {
+    "actor": "carol",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 15
+   },
+   {
+    "actor": "alice",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 21
+   },
+   {
+    "actor": "carol",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 16
+   },
+   {
+    "actor": "carol",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 17
+   },
+   {
+    "actor": "carol",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 18
+   },
+   {
+    "actor": "carol",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 19
+   },
+   {
+    "actor": "alice",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 22
+   },
+   {
+    "actor": "alice",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 23
+   },
+   {
+    "actor": "bob",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 19
+   },
+   {
+    "actor": "alice",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 24
+   },
+   {
+    "actor": "alice",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 25
+   },
+   {
+    "actor": "bob",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 20
+   },
+   {
+    "actor": "carol",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 20
+   },
+   {
+    "actor": "bob",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 21
+   },
+   {
+    "actor": "alice",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 26
+   },
+   {
+    "actor": "bob",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 22
+   },
+   {
+    "actor": "bob",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 23
+   },
+   {
+    "actor": "bob",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 24
+   },
+   {
+    "actor": "carol",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 21
+   },
+   {
+    "actor": "carol",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 22
+   },
+   {
+    "actor": "carol",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 23
+   },
+   {
+    "actor": "alice",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 27
+   },
+   {
+    "actor": "carol",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 24
+   },
+   {
+    "actor": "carol",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 25
+   },
+   {
+    "actor": "alice",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 28
+   },
+   {
+    "actor": "alice",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 29
+   },
+   {
+    "actor": "bob",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 25
+   },
+   {
+    "actor": "alice",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 30
+   },
+   {
+    "actor": "alice",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 31
+   },
+   {
+    "actor": "bob",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 26
+   },
+   {
+    "actor": "bob",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 27
+   },
+   {
+    "actor": "bob",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 28
+   },
+   {
+    "actor": "alice",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 32
+   },
+   {
+    "actor": "bob",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 29
+   },
+   {
+    "actor": "carol",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 26
+   },
+   {
+    "actor": "bob",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 30
+   },
+   {
+    "actor": "carol",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 27
+   },
+   {
+    "actor": "alice",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 33
+   },
+   {
+    "actor": "carol",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 28
+   },
+   {
+    "actor": "carol",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 29
+   },
+   {
+    "actor": "carol",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 30
+   },
+   {
+    "actor": "carol",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 31
+   },
+   {
+    "actor": "bob",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 31
+   },
+   {
+    "actor": "alice",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 34
+   },
+   {
+    "actor": "alice",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 35
+   },
+   {
+    "actor": "alice",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 36
+   },
+   {
+    "actor": "alice",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 37
+   },
+   {
+    "actor": "alice",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 38
+   },
+   {
+    "actor": "bob",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 32
+   },
+   {
+    "actor": "alice",
+    "command": "revoke",
+    "outcome": "ok",
+    "sequence": 39
+   },
+   {
+    "actor": "alice",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 40
+   },
+   {
+    "actor": "alice",
+    "command": "release",
+    "outcome": "read_fenced",
+    "sequence": 41
+   },
+   {
+    "actor": "bob",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 33
+   },
+   {
+    "actor": "bob",
+    "command": "release",
+    "outcome": "read_fenced",
+    "sequence": 34
+   },
+   {
+    "actor": "carol",
+    "command": "consume",
+    "outcome": "read_fenced",
+    "sequence": 32
+   },
+   {
+    "actor": "alice",
+    "command": "repair_plan",
+    "outcome": "ok",
+    "sequence": 42
+   },
+   {
+    "actor": "alice",
+    "command": "submit_commit",
+    "outcome": "ok",
+    "sequence": 43
+   },
+   {
+    "actor": "alice",
+    "command": "confirm_repair",
+    "outcome": "ok",
+    "sequence": 44
+   },
+   {
+    "actor": "bob",
+    "command": "confirm_repair",
+    "outcome": "ok",
+    "sequence": 35
+   },
+   {
+    "actor": "alice",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 45
+   },
+   {
+    "actor": "alice",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 46
+   },
+   {
+    "actor": "alice",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 47
+   },
+   {
+    "actor": "alice",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 48
+   },
+   {
+    "actor": "carol",
+    "command": "consume",
+    "outcome": "unauthorized",
+    "sequence": 33
+   },
+   {
+    "actor": "bob",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 36
+   },
+   {
+    "actor": "alice",
+    "command": "revoke",
+    "outcome": "ok",
+    "sequence": 49
+   },
+   {
+    "actor": "bob",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 37
+   },
+   {
+    "actor": "bob",
+    "command": "release",
+    "outcome": "unauthorized",
+    "sequence": 38
+   },
+   {
+    "actor": "alice",
+    "command": "grant",
+    "outcome": "ok",
+    "sequence": 50
+   },
+   {
+    "actor": "bob",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 39
+   },
+   {
+    "actor": "bob",
+    "command": "release",
+    "outcome": "unauthorized",
+    "sequence": 40
+   },
+   {
+    "actor": "bob",
+    "command": "submit_commit",
+    "outcome": "ok",
+    "sequence": 41
+   },
+   {
+    "actor": "bob",
+    "command": "allocate",
+    "outcome": "ok",
+    "sequence": 42
+   },
+   {
+    "actor": "bob",
+    "command": "release",
+    "outcome": "ok",
+    "sequence": 43
+   },
+   {
+    "actor": "bob",
+    "command": "persist",
+    "outcome": "ok",
+    "sequence": 44
+   },
+   {
+    "actor": "bob",
+    "command": "emit",
+    "outcome": "ok",
+    "sequence": 45
+   },
+   {
+    "actor": "alice",
+    "command": "consume",
+    "outcome": "ok",
+    "sequence": 51
+   }
+  ]
+ }
+}

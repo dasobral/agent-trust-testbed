@@ -3,7 +3,7 @@
 # one backend. Exit status 0 only if every gate passed.
 #   scripts/ci.sh                          # local backend, E1 to E4, E7, E8 (both suites), E9, E10, E1 over mTLS
 #   SCALE=1 scripts/ci.sh                  # also E5 in the classical suite (about five minutes)
-#   SCALE=pq scripts/ci.sh                 # also E5 in the pq suite (fails its bound until F-8 is fixed)
+#   SCALE=pq scripts/ci.sh                 # also E5 in the pq suite (passes since agent-trust R-13 fixed F-8)
 #   BACKEND=compose scripts/ci.sh          # containers (builds the image first)
 #   BACKEND=k8s scripts/ci.sh              # Kubernetes (cluster and image ready, see deploy/k3s)
 #   RECORD=results scripts/ci.sh           # copy each run's evidence into results/<id>/<date>-<backend>
@@ -11,8 +11,8 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 BACKEND="${BACKEND:-local}"
 EXPERIMENTS="${EXPERIMENTS:-e1-revocation-fence e1-revocation-fence-mtls e2-entropy-outage e3-restarts e4-hostile-commits e7-confused-deputy e8-suite-pq e8-suite-classical e9-ack-policy e10-delegation-expiry}"
-# E5 in the classical suite. E5 in the default pq suite exceeds its round bound until the
-# kernel history cost (finding F-8) is fixed; run it with SCALE=pq (docs/experiments/E5-scale.md).
+# E5 in the classical suite (SCALE=1) or in the default pq suite (SCALE=pq). The pq run
+# passes since agent-trust R-13 fixed the kernel history cost (finding F-8).
 [ "${SCALE:-0}" = 1 ] && EXPERIMENTS="$EXPERIMENTS e5-scale-classical"
 [ "${SCALE:-0}" = pq ] && EXPERIMENTS="$EXPERIMENTS e5-scale"
 [ "$BACKEND" = k8s ] && EXPERIMENTS="k8s-isolation $EXPERIMENTS"

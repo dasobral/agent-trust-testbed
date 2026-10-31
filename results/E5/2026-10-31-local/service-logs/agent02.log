@@ -1,0 +1,46 @@
+{"entropy":"qrng","event":"listening","listen":"127.0.0.1:54535","name":"agent02","public_key":"23a8f4b4e90faee15e91616388c0be22bb34014714717352d4361952978035e47bea4e8424dff776226aaee057cf4e03bb0fd53c37326e46b619adbdbb420466d105d77c9bbe912bac3d3d7294a4658c0025c4b3ea02f0c1f372413ab559202bf223e7f47555f355728da5315765613c65a6fc815cca6c7160c16252d52997bb326d84c800abc0ad8dd5c7ad9c7557b2dab15ae6e34ec9806025383e23c95a31da31bc40513d454e6fad9c916b9f165194537dd8f83477af221d86cbd70ce2b0ea53225c379391867d15c764129d3f925b0986c59b43fb081ea8219093fd76465b8dab9a5d2bc8c33edaefa27a6d95bb67fed3531a80ccdad8e210251bfbde8b25a70925d3a2582814ab0a948a4e410ede93868b6eebc26f03b85b9138c9a9808d0eace63feea6b78f13218d824c1f4b78b03c5b29307b449fd0b9f23f4203e30a62f0354936bb3644e84c55fe54042653e63e3911ffd9c21aa7aa28b6a52bb325728a9c0e57e10d797a8ea87e9c45c6d9e15f51626a120894022598efefa41c817eb85aba50581ee5a381250a1bd9d4d09043b8340424a1379f13b3b11c431e73c212cda0ec4b9ee74cdc4a6f0844814b156616c05d8643d0075316b3056549795d63c87c97bcba10b2bb66901985e0a21d6f90001915243bcd62cef8b3ea619001747ebb8eebb73059d4a1e337cbc0ab530ab7adb4eaa083a25176891af8ba2aa2e6aa25e7ac81c8ad390e22c89830f996382c9bb73d01c3565686e936fa486272554b6a3627c8d1b0e49ec4e64c14eb0e50bdc48780fbc6e29386e15e796112ea0c2c22c63cb629bd016313dd536c9378fd582435a9fcbc8f21aba9162565a6ceff98aabbabfa9f7681af8a78b2dfdae1fb72310684f87e90779cd71becf55944f14f42168c9c4c9c747928b9da424f13eda55ba078f9d56e20e6f685793e2e272658c5ef924bdfe100adf701cbdcb6445379c04a2daf3d32d4be73cb20844fb43f85e1172f7e4dccd50bb9bb004de5bf608ebd813558419d15799763c3305730fb6239f5a749d87b6b562e2aaa46ca3d975adb252ce0d7985ef5de7d1d855d8310d4ba441db30eebbdc80493f4ed7719d0af7440ff51672cc3f34544101ca74bf6eba34f12e6bd72f00588627be50866bac4a4e743dd9736b493eaee7e723f8ca98f3d39cf3bc332254ed13a8fa25110b9bcd828a0bdd106dc86d3cdd855a466498df56b0b9fee0dbbb2895287e3ce7c0157958d41761db269429a249eb3eb0f533f7dcc710f65bff04ec5947280e88efb93e1956d936d3cb724c2d14bac251e14b335c86f5c2af80bf8a5ceddf94523559687aed180edcb25a36e28bd40e4869d2c8268b3c9cd609687b5ef898578e00ddd3eb640b88e3b7d5fe78fafaa3ee0874f79633d9c0b01cfd9f08907250308835023379acb39e49597d1a04bb345da54dc4647511905dc30b1317b3451fe794b8d9691ae571dfccc9e20607b8900f9ba2cf602cfb3b20230512dd14511895d68e0f4288bd62ee889aec60c9397d78bda1baf644474e1dfa108818a90781aca2b6976a3321f2c2b6059c544b8f9c7b8bdfb63ea06efa329fdd9c70c05f0d7ed83e27735c86b0efffe81ffa75034f4cf07d036a1decd92e523d4c0ba4081612d192d2777b16e2e169fcaeede1189f419181129da4e0935291d22fbc8515294fcf139060006b850411bb07002ed46ff231bd2d99dc18fba86b2e03ca0d25f2ed4239172924682b569aca2d303b6d9857e49c6fb9a43c8cee840a5c1a479d443c58d95d338bc7cc657ac81077d944be8766c63dac1f6588f2754c567a5f55b656e2ea57351cafba2346749fe66d566","role":"agent","ts":1793481549}
+{"event":"joined","name":"agent02","role":"agent","ts":1793481550}
+{"event":"delivered","name":"agent02","op":"agent05-000001","role":"agent","ts":1793481559}
+{"event":"delivered","name":"agent02","op":"agent01-000001","role":"agent","ts":1793481560}
+{"event":"delivered","name":"agent02","op":"agent06-000001","role":"agent","ts":1793481560}
+{"event":"delivered","name":"agent02","op":"agent07-000001","role":"agent","ts":1793481560}
+{"event":"delivered","name":"agent02","op":"agent04-000001","role":"agent","ts":1793481561}
+{"event":"delivered","name":"agent02","op":"agent03-000001","role":"agent","ts":1793481561}
+{"event":"delivered","name":"agent02","op":"agent08-000001","role":"agent","ts":1793481562}
+{"event":"delivered","name":"agent02","op":"agent01-000002","role":"agent","ts":1793481564}
+{"event":"delivered","name":"agent02","op":"agent07-000002","role":"agent","ts":1793481564}
+{"event":"delivered","name":"agent02","op":"agent04-000002","role":"agent","ts":1793481565}
+{"event":"delivered","name":"agent02","op":"agent05-000002","role":"agent","ts":1793481565}
+{"event":"delivered","name":"agent02","op":"agent06-000002","role":"agent","ts":1793481565}
+{"event":"delivered","name":"agent02","op":"agent08-000002","role":"agent","ts":1793481566}
+{"event":"delivered","name":"agent02","op":"agent03-000002","role":"agent","ts":1793481566}
+{"event":"delivered","name":"agent02","op":"agent01-000003","role":"agent","ts":1793481568}
+{"event":"delivered","name":"agent02","op":"agent04-000003","role":"agent","ts":1793481568}
+{"event":"delivered","name":"agent02","op":"agent05-000003","role":"agent","ts":1793481569}
+{"event":"delivered","name":"agent02","op":"agent07-000003","role":"agent","ts":1793481569}
+{"event":"delivered","name":"agent02","op":"agent06-000003","role":"agent","ts":1793481570}
+{"event":"delivered","name":"agent02","op":"agent08-000003","role":"agent","ts":1793481570}
+{"event":"delivered","name":"agent02","op":"agent03-000003","role":"agent","ts":1793481570}
+{"event":"delivered","name":"agent02","op":"agent01-000004","role":"agent","ts":1793481572}
+{"event":"delivered","name":"agent02","op":"agent06-000004","role":"agent","ts":1793481573}
+{"event":"delivered","name":"agent02","op":"agent07-000004","role":"agent","ts":1793481573}
+{"event":"delivered","name":"agent02","op":"agent05-000004","role":"agent","ts":1793481573}
+{"event":"delivered","name":"agent02","op":"agent08-000004","role":"agent","ts":1793481574}
+{"event":"delivered","name":"agent02","op":"agent04-000004","role":"agent","ts":1793481574}
+{"event":"delivered","name":"agent02","op":"agent03-000004","role":"agent","ts":1793481575}
+{"event":"delivered","name":"agent02","op":"agent06-000005","role":"agent","ts":1793481577}
+{"event":"delivered","name":"agent02","op":"agent04-000005","role":"agent","ts":1793481577}
+{"event":"delivered","name":"agent02","op":"agent03-000005","role":"agent","ts":1793481578}
+{"error":"undecryptable: MLS processing","event":"rejected","name":"agent02","op":"agent03-000005","role":"agent","ts":1793481578}
+{"event":"delivered","name":"agent02","op":"agent07-000005","role":"agent","ts":1793481578}
+{"event":"delivered","name":"agent02","op":"agent08-000005","role":"agent","ts":1793481579}
+{"event":"delivered","name":"agent02","op":"agent01-000005","role":"agent","ts":1793481579}
+{"event":"delivered","name":"agent02","op":"agent05-000005","role":"agent","ts":1793481580}
+{"error":"undecryptable: MLS processing","event":"rejected","name":"agent02","op":"agent05-000005","role":"agent","ts":1793481580}
+{"error":"undecryptable: MLS processing","event":"rejected","name":"agent02","op":"agent07-000005","role":"agent","ts":1793481580}
+{"event":"delivered","name":"agent02","op":"agent01-000006","role":"agent","ts":1793481583}
+{"event":"delivered","name":"agent02","op":"agent04-000006","role":"agent","ts":1793481583}
+{"event":"delivered","name":"agent02","op":"agent06-000006","role":"agent","ts":1793481584}
+{"event":"delivered","name":"agent02","op":"agent03-000006","role":"agent","ts":1793481584}
+{"event":"delivered","name":"agent02","op":"agent05-000006","role":"agent","ts":1793481585}
+{"event":"delivered","name":"agent02","op":"agent07-000006","role":"agent","ts":1793481585}

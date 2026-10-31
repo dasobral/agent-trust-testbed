@@ -38,7 +38,7 @@ use std::time::Duration;
 
 use agent_trust::adapter::ClientIdentity;
 use agent_trust::adapter::SignedRequest;
-use agent_trust::client::{ClientEndpoint, JoinCandidate, PendingDelivery, PreparedJoin};
+use agent_trust::client::{ClientEndpoint, HeadTracker, JoinCandidate, PendingDelivery, PreparedJoin};
 use agent_trust::entropy::{DurableLabProvider, EntropyConfig, LabEntropy};
 use agent_trust::suite::Suite;
 use agent_trust::wire::{
@@ -109,6 +109,8 @@ struct Agent {
     public_key: Vec<u8>,
     sequence: u64,
     apf_public: Option<Vec<u8>>,
+    /// agent-trust R-13d.4: the latest APF-signed history head this agent has seen.
+    heads: Option<HeadTracker>,
     membership: Membership,
     /// The next handshake log index to process.
     cursor: u64,
@@ -264,6 +266,7 @@ impl Agent {
             entropy,
             sequence: 0,
             apf_public: None,
+            heads: None,
             cursor: 0,
             retain: false,
             next_op: 0,
@@ -545,10 +548,16 @@ impl Agent {
     // -----------------------------------------------------------------------
 
     /// Signs `body` with the registered key at the next sequence and sends it (§4.8).
-    fn request(&mut self, body: Value) -> Result<Value, String> {
+    /// agent-trust R-13d.4: the body carries the latest history head this agent saw, so an
+    /// APF that serves an older or different history refuses it (`fork_detected`); the
+    /// head in the response must not go back.
+    fn request(&mut self, mut body: Value) -> Result<Value, String> {
         self.sequence += 1;
         // Write-ahead: a restart must never reuse a sequence the APF may have consumed.
         self.save()?;
+        if let Some(heads) = &self.heads {
+            heads.attach(&mut body);
+        }
         let signed = SignedRequest::sign(
             &self.cfg.group,
             &self.cfg.name,
@@ -560,7 +569,22 @@ impl Agent {
             "actor": signed.actor, "sequence": signed.sequence,
             "body": hex::encode(&signed.body), "signature": hex::encode(&signed.signature),
         });
-        self.cfg.apf.call("POST", "/v1/request", Some(&wire))
+        let mut response = self.cfg.apf.call("POST", "/v1/request", Some(&wire))?;
+        // The head is transport metadata: it is taken out before the result goes on.
+        let head = response
+            .as_object_mut()
+            .and_then(|fields| fields.remove("history_head"));
+        if let Some(head) = head.as_ref().and_then(Value::as_str) {
+            let head = hex::decode(head).map_err(|_| "malformed: history_head".to_string())?;
+            if self.heads.is_none() {
+                let key = self.apf_key()?;
+                self.heads = Some(HeadTracker::new(&key, &self.cfg.group));
+            }
+            if let Some(heads) = &mut self.heads {
+                heads.observe(&head)?;
+            }
+        }
+        Ok(response)
     }
 
     fn signed_body(&mut self, body: &Value) -> Result<Value, String> {
