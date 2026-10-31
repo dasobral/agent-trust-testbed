@@ -50,9 +50,9 @@ a reachable endpoint. In every run here the QRNG service is a **mock** (OS RNG b
 quantum origin is claimed.
 
 Stack under test: each library follows a branch, and `Cargo.lock` records the commit:
-agent-trust `main` (`e774ba2`: the durable provider, C-41, the post quantum suite, C-42,
+agent-trust `main` (`783ea61`: the durable provider, C-41, the post quantum suite, C-42,
 D-14 `pq-preferred` for a real Entropy Core, R-11, the policy binding in the canonical
-ack, and R-12, delegation expiry as a ledger event), OpenMLS fork branch
+ack, R-12, delegation expiry as a ledger event, and the fork bump to `93ad743`), OpenMLS fork branch
 `agent-trust/integration` (`93ad743`, since 2026-10-31: the reviewed libcrux entropy change,
 one DRBG state shared by HPKE senders and reseeded every 2^16 requests; the runs of
 2026-10-25 used `dd33278`) with the feature `draft-ietf-mls-pq-ciphersuites`,
