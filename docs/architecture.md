@@ -22,7 +22,7 @@ contract each network flow implements.
 | Layer | Repository | Branch (commit in `Cargo.lock`, 2026-10-25) | What it gives the layer above |
 |---|---|---|---|
 | L0 | `dasobral/openmls-qrand` | `main` (`868f058`: post quantum TLS and the negotiated key exchange report) | `OpenMlsRand` over a QRNG Open API endpoint, over post quantum TLS (`X25519MLKEM768`); fail closed; reports the negotiated group |
-| L1 | `dasobral/openmls` (`agent-trust/integration`) | `agent-trust/integration` (`dd33278`), feature `draft-ietf-mls-pq-ciphersuites` | MLS groups (including the post quantum suite `0x0052`), the public sequencer, staged KeyPackages, a DRBG seeded from L0 |
+| L1 | `dasobral/openmls` (`agent-trust/integration`) | `agent-trust/integration` (`93ad743`), feature `draft-ietf-mls-pq-ciphersuites` | MLS groups (including the post quantum suite `0x0052`), the public sequencer, staged KeyPackages, a DRBG seeded from L0 |
 | L2 | `dasobral/agent-trust` | `main` (`6ec41e8`: the durable provider, F-2 and C-41; the post quantum suite, F-9 and C-42; D-14, `pq-preferred` for a real Entropy Core) | The APF kernel and adapter, the client endpoint, the trace export and the oracle; the `pq` suite (ML-DSA-44 and X-Wing) by default |
 | L3 | this repository, `crates/att-node` | | The L2 parties as separate network processes |
 | L4 | this repository, `controller/attctl` | | Deployment, control, experiments, evidence |

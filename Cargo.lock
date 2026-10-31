@@ -1903,7 +1903,7 @@ checksum = "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50"
 [[package]]
 name = "openmls"
 version = "0.9.0"
-source = "git+https://github.com/dasobral/openmls.git?branch=agent-trust%2Fintegration#dd33278099426c2ffc8a4ec686e88bde1f937963"
+source = "git+https://github.com/dasobral/openmls.git?branch=agent-trust%2Fintegration#93ad743ebe55d8983558ded3876729a00b8c291c"
 dependencies = [
  "log",
  "openmls_basic_credential",
@@ -1925,7 +1925,7 @@ dependencies = [
 [[package]]
 name = "openmls_basic_credential"
 version = "0.6.0"
-source = "git+https://github.com/dasobral/openmls.git?branch=agent-trust%2Fintegration#dd33278099426c2ffc8a4ec686e88bde1f937963"
+source = "git+https://github.com/dasobral/openmls.git?branch=agent-trust%2Fintegration#93ad743ebe55d8983558ded3876729a00b8c291c"
 dependencies = [
  "ed25519-dalek 3.0.0",
  "getrandom 0.4.3",
@@ -1942,7 +1942,7 @@ dependencies = [
 [[package]]
 name = "openmls_libcrux_crypto"
 version = "0.4.0"
-source = "git+https://github.com/dasobral/openmls.git?branch=agent-trust%2Fintegration#dd33278099426c2ffc8a4ec686e88bde1f937963"
+source = "git+https://github.com/dasobral/openmls.git?branch=agent-trust%2Fintegration#93ad743ebe55d8983558ded3876729a00b8c291c"
 dependencies = [
  "hpke-rs",
  "hpke-rs-crypto",
@@ -1965,7 +1965,7 @@ dependencies = [
 [[package]]
 name = "openmls_memory_storage"
 version = "0.6.0"
-source = "git+https://github.com/dasobral/openmls.git?branch=agent-trust%2Fintegration#dd33278099426c2ffc8a4ec686e88bde1f937963"
+source = "git+https://github.com/dasobral/openmls.git?branch=agent-trust%2Fintegration#93ad743ebe55d8983558ded3876729a00b8c291c"
 dependencies = [
  "hex",
  "log",
@@ -1994,7 +1994,7 @@ dependencies = [
 [[package]]
 name = "openmls_rust_crypto"
 version = "0.6.0"
-source = "git+https://github.com/dasobral/openmls.git?branch=agent-trust%2Fintegration#dd33278099426c2ffc8a4ec686e88bde1f937963"
+source = "git+https://github.com/dasobral/openmls.git?branch=agent-trust%2Fintegration#93ad743ebe55d8983558ded3876729a00b8c291c"
 dependencies = [
  "aes-gcm",
  "chacha20poly1305",
@@ -2020,7 +2020,7 @@ dependencies = [
 [[package]]
 name = "openmls_serialization_helpers"
 version = "0.1.0"
-source = "git+https://github.com/dasobral/openmls.git?branch=agent-trust%2Fintegration#dd33278099426c2ffc8a4ec686e88bde1f937963"
+source = "git+https://github.com/dasobral/openmls.git?branch=agent-trust%2Fintegration#93ad743ebe55d8983558ded3876729a00b8c291c"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2031,7 +2031,7 @@ dependencies = [
 [[package]]
 name = "openmls_sqlite_storage"
 version = "0.3.0"
-source = "git+https://github.com/dasobral/openmls.git?branch=agent-trust%2Fintegration#dd33278099426c2ffc8a4ec686e88bde1f937963"
+source = "git+https://github.com/dasobral/openmls.git?branch=agent-trust%2Fintegration#93ad743ebe55d8983558ded3876729a00b8c291c"
 dependencies = [
  "openmls_traits",
  "refinery",
@@ -2042,7 +2042,7 @@ dependencies = [
 [[package]]
 name = "openmls_test"
 version = "0.3.0"
-source = "git+https://github.com/dasobral/openmls.git?branch=agent-trust%2Fintegration#dd33278099426c2ffc8a4ec686e88bde1f937963"
+source = "git+https://github.com/dasobral/openmls.git?branch=agent-trust%2Fintegration#93ad743ebe55d8983558ded3876729a00b8c291c"
 dependencies = [
  "openmls_libcrux_crypto",
  "openmls_rust_crypto",
@@ -2055,7 +2055,7 @@ dependencies = [
 [[package]]
 name = "openmls_traits"
 version = "0.6.0"
-source = "git+https://github.com/dasobral/openmls.git?branch=agent-trust%2Fintegration#dd33278099426c2ffc8a4ec686e88bde1f937963"
+source = "git+https://github.com/dasobral/openmls.git?branch=agent-trust%2Fintegration#93ad743ebe55d8983558ded3876729a00b8c291c"
 dependencies = [
  "maybe-async",
  "serde",
@@ -3343,7 +3343,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]

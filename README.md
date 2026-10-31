@@ -53,7 +53,9 @@ Stack under test: each library follows a branch, and `Cargo.lock` records the co
 agent-trust `main` (`e774ba2`: the durable provider, C-41, the post quantum suite, C-42,
 D-14 `pq-preferred` for a real Entropy Core, R-11, the policy binding in the canonical
 ack, and R-12, delegation expiry as a ledger event), OpenMLS fork branch
-`agent-trust/integration` (`dd33278`) with the feature `draft-ietf-mls-pq-ciphersuites`,
+`agent-trust/integration` (`93ad743`, since 2026-10-31: the reviewed libcrux entropy change,
+one DRBG state shared by HPKE senders and reseeded every 2^16 requests; the runs of
+2026-10-25 used `dd33278`) with the feature `draft-ietf-mls-pq-ciphersuites`,
 openmls-qrand `main` (`868f058`: post quantum TLS and the negotiated key exchange
 report). `cargo update` takes the latest. E9 and E10 cover R-11 and R-12. With this stack
 every local experiment passes at testbed `6481e8e`
